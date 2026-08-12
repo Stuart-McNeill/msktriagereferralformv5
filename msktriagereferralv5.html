@@ -1,0 +1,1929 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MSK Podiatry Triage</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700;9..40,800&display=swap" rel="stylesheet">
+<style>
+/* ── THEME TOKENS ─────────────────────────────── */
+:root {
+  --green:#C8F000; --green-dim:#a8cc00;
+  --green-bg:rgba(200,240,0,0.08); --green-border:rgba(200,240,0,0.25);
+  --blue:#5b9cf6; --blue-bg:rgba(91,156,246,0.1);
+  --red:#E24B4A; --red-bg:rgba(226,75,74,0.1); --red-border:rgba(226,75,74,0.25);
+  --amber:#f5a623; --amber-bg:rgba(245,166,35,0.1);
+  --radius:16px; --font:'DM Sans',system-ui,sans-serif;
+}
+[data-theme="dark"] {
+  --dark:#0f0f0f; --surface:#1a1a1a; --surface2:#242424; --surface3:#2e2e2e;
+  --text:#f0f0f0; --text-muted:#888; --text-hint:#484848;
+  --border:rgba(255,255,255,0.08); --border-med:rgba(255,255,255,0.14);
+  --range-bg:#2e2e2e; --range-thumb-border:#0f0f0f;
+  --print-card:#1a1a1a; --print-border:rgba(255,255,255,0.08);
+}
+[data-theme="light"] {
+  --dark:#f4f4f4; --surface:#ffffff; --surface2:#f0f0f0; --surface3:#e4e4e4;
+  --text:#111111; --text-muted:#555555; --text-hint:#aaaaaa;
+  --border:rgba(0,0,0,0.1); --border-med:rgba(0,0,0,0.2);
+  --range-bg:#e4e4e4; --range-thumb-border:#ffffff;
+  --print-card:#ffffff; --print-border:rgba(0,0,0,0.1);
+  --green-bg:rgba(26,127,212,0.08); --green-border:rgba(26,127,212,0.28);
+  --red-bg:rgba(200,60,60,0.07); --red-border:rgba(200,60,60,0.25);
+}
+/* Light mode primary accent: NHS sky blue #1a7fd4 / deep #1060a8 */
+[data-theme="light"] .opt.selected{border-color:#1a7fd4;background:rgba(26,127,212,0.07);}
+[data-theme="light"] .opt.selected .opt-label{color:#1060a8;}
+[data-theme="light"] .opt.selected .opt-marker{background:#1a7fd4;border-color:#1a7fd4;}
+[data-theme="light"] .header-logo{background:#1a7fd4;}
+[data-theme="light"] .btn-next{background:#1a7fd4;color:#fff;}
+[data-theme="light"] .btn-next:hover{background:#1060a8;}
+[data-theme="light"] .prog-fill{background:#1a7fd4;}
+[data-theme="light"] .act-btn-primary{background:#1a7fd4;border-color:#1a7fd4;color:#fff;}
+[data-theme="light"] .act-btn-primary:hover{background:#1060a8;border-color:#1060a8;color:#fff;}
+[data-theme="light"] .goal-card{background:rgba(26,127,212,0.06);border-color:rgba(26,127,212,0.25);}
+[data-theme="light"] .goal-text{color:#1060a8;}
+[data-theme="light"] .goal-sub{color:rgba(16,96,168,0.5);}
+[data-theme="light"] .goal-icon{background:#1a7fd4;}
+[data-theme="light"] .quote-box{border-left-color:#1a7fd4;}
+[data-theme="light"] .section-tag[data-sec="green"]{color:#1060a8!important;background:rgba(26,127,212,0.08)!important;border-color:rgba(26,127,212,0.25)!important;}
+[data-theme="light"] .badge-patient{color:#1060a8;background:rgba(26,127,212,0.08);border-color:rgba(26,127,212,0.25);}
+[data-theme="light"] .sum-flag-badge.flag-clear{background:rgba(60,150,80,0.08);color:#3a8a50;}
+[data-theme="light"] .red-flag-clear{background:rgba(60,150,80,0.06);color:#3a8a50;}
+[data-theme="light"] .kpi-val{color:var(--text);}
+[data-theme="light"] input[type=range]::-webkit-slider-thumb{background:#1a7fd4;}
+[data-theme="light"] .efas-card,.scale-card{background:var(--surface2);}
+[data-theme="light"] .chip-g{background:rgba(26,127,212,0.08);color:#1060a8;border-color:rgba(26,127,212,0.25);}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{font-size:16px;}
+body{font-family:var(--font);background:var(--dark);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased;transition:background 0.2s,color 0.2s;display:flex;justify-content:center;padding:0;}
+
+/* RESPONSIVE APP CONTAINER */
+#app{
+  width:100%;
+  max-width:768px;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  background:var(--dark);
+  box-shadow: 0 0 40px rgba(0,0,0,0.4);
+}
+@media(min-width: 769px){
+  #app{
+    min-height:92vh;
+    margin:4vh auto;
+    border-radius:24px;
+    border:1px solid var(--border);
+    overflow:hidden;
+  }
+}
+
+.hidden{display:none!important;}
+
+/* HEADER */
+.app-header{background:var(--surface);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:50;}
+.header-logo{width:38px;height:38px;background:var(--green);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.header-logo svg{width:20px;height:20px;}
+.header-text{flex:1;}
+.header-title{font-size:14px;font-weight:800;letter-spacing:0.07em;text-transform:uppercase;}
+.header-sub{font-size:12px;color:var(--text-muted);margin-top:1px;}
+.header-mode-badge{font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:4px 12px;border-radius:20px;}
+.badge-patient{background:var(--green-bg);color:var(--green);border:1px solid var(--green-border);}
+.badge-clinician{background:var(--blue-bg);color:var(--blue);border:1px solid rgba(91,156,246,0.25);}
+
+/* THEME TOGGLE */
+.theme-toggle{display:flex;align-items:center;background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:3px;gap:2px;flex-shrink:0;margin-right:2px;}
+.theme-btn{width:28px;height:28px;border-radius:16px;border:none;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background 0.15s;color:var(--text-muted);}
+.theme-btn.active{background:var(--surface3);color:var(--text);}
+.theme-btn svg{width:14px;height:14px;}
+
+/* PROGRESS */
+#progress-wrap{background:var(--surface);padding:12px 24px 16px;border-bottom:1px solid var(--border);}
+.prog-meta{display:flex;justify-content:space-between;margin-bottom:7px;}
+.prog-section{font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);}
+.prog-count{font-size:11px;color:var(--text-hint);}
+.prog-track{height:4px;background:var(--surface3);border-radius:2px;overflow:hidden;}
+.prog-fill{height:100%;background:var(--green);border-radius:2px;transition:width 0.35s cubic-bezier(.4,0,.2,1);}
+
+/* QUESTION AREA */
+#question-area{flex:1;padding:28px 24px 20px;overflow-y:auto;}
+.section-tag{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;border-radius:5px;padding:4px 10px;margin-bottom:14px;}
+.q-headline{font-size:24px;font-weight:800;line-height:1.25;margin-bottom:8px;}
+.q-sub{font-size:14px;color:var(--text-muted);margin-bottom:24px;line-height:1.55;}
+
+.warn-banner{background:var(--red-bg);border:1px solid var(--red-border);border-radius:12px;padding:14px 16px;margin-bottom:20px;display:flex;gap:12px;align-items:flex-start;font-size:13px;color:#f09595;line-height:1.55;}
+[data-theme="light"] .warn-banner{color:#c03030;}
+.warn-banner svg{flex-shrink:0;margin-top:1px;}
+
+/* VALIDATION ERROR */
+.field-error{font-size:11px;color:var(--red);margin-top:4px;display:none;}
+.field-error.show{display:block;}
+.field-input.err,.err-input{border-color:var(--red)!important;}
+
+/* OPTIONS */
+.options-list{display:flex;flex-direction:column;gap:10px;}
+@media(min-width:600px){
+  .options-list.grid-opt{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;}
+}
+.opt{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius);padding:14px 18px;cursor:pointer;display:flex;align-items:center;gap:14px;transition:border-color 0.12s,background 0.12s;user-select:none;-webkit-tap-highlight-color:transparent;}
+.opt:hover{border-color:var(--border-med);background:var(--surface2);}
+.opt.selected{border-color:var(--green);background:var(--green-bg);}
+.opt.none-opt{margin-top:4px;}
+.opt-marker{width:20px;height:20px;border-radius:50%;border:1.5px solid var(--text-hint);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all 0.12s;}
+.opt.sq .opt-marker{border-radius:5px;}
+.opt.selected .opt-marker{background:var(--green);border-color:var(--green);}
+.opt-marker svg{display:none;width:11px;height:11px;}
+.opt.selected .opt-marker svg{display:block;}
+.opt-label{font-size:14px;font-weight:500;flex:1;transition:color 0.12s;}
+.opt.selected .opt-label{color:var(--green);}
+.opt.none-opt .opt-label{color:var(--text-muted);}
+.opt.none-opt.selected .opt-label{color:var(--green);}
+
+/* SCALE 0-10 */
+.scale-card{background:var(--surface2);border-radius:16px;padding:26px 24px 20px;margin-bottom:16px;}
+.scale-num-big{font-size:72px;font-weight:800;color:var(--green);text-align:center;line-height:1;margin-bottom:8px;letter-spacing:-2px;}
+.scale-ends{display:flex;justify-content:space-between;font-size:12px;color:var(--text-hint);margin-bottom:16px;}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:6px;background:var(--range-bg);border-radius:3px;outline:none;cursor:pointer;}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:26px;height:26px;border-radius:50%;background:var(--green);border:3px solid var(--range-thumb-border);box-shadow:0 0 0 2px rgba(200,240,0,0.3);}
+.scale-ticks{display:flex;justify-content:space-between;margin-top:10px;padding:0 2px;}
+.scale-tick{font-size:11px;color:var(--text-hint);}
+
+/* EFAS 0-4 */
+.efas-card{background:var(--surface2);border-radius:16px;padding:24px;margin-bottom:16px;}
+.efas-num-big{font-size:72px;font-weight:800;text-align:center;line-height:1;margin-bottom:6px;letter-spacing:-2px;transition:color 0.2s;}
+.efas-label-display{text-align:center;font-size:14px;font-weight:700;margin-bottom:16px;min-height:20px;transition:color 0.2s;}
+.efas-ends{display:flex;justify-content:space-between;font-size:12px;color:var(--text-hint);margin-bottom:12px;}
+.efas-ticks{display:flex;justify-content:space-between;margin-top:10px;padding:0 2px;}
+.efas-tick{font-size:11px;color:var(--text-hint);}
+
+/* TEXT INPUTS & SELECTS */
+.field-group{display:flex;flex-direction:column;gap:12px;margin-bottom:6px;}
+.field-item{display:flex;flex-direction:column;gap:6px;}
+.field-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-muted);}
+.req{color:var(--red);margin-left:2px;}
+.field-input{background:var(--surface);border:1.5px solid var(--border);border-radius:12px;color:var(--text);font-family:var(--font);font-size:15px;padding:14px 16px;outline:none;transition:border-color 0.12s;width:100%;}
+.field-input:focus{border-color:rgba(200,240,0,0.35);}
+.field-input::placeholder{color:var(--text-hint);}
+
+select.field-input {
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23888888' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+  padding-right: 40px;
+  cursor: pointer;
+}
+select.field-input option {
+  background: var(--surface);
+  color: var(--text);
+}
+
+/* FOLLOWUP & FREETEXT */
+.followup-block{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:16px 18px;margin-top:16px;}
+.followup-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-muted);margin-bottom:8px;}
+textarea{width:100%;background:var(--surface3);border:1.5px solid var(--border);border-radius:10px;color:var(--text);font-family:var(--font);font-size:15px;padding:14px 16px;resize:none;outline:none;line-height:1.6;transition:border-color 0.12s;}
+textarea:focus{border-color:rgba(200,240,0,0.35);}
+textarea::placeholder{color:var(--text-hint);}
+.freetext-main{margin-top:6px;}
+
+/* NAV */
+#nav-bar{padding:16px 24px 24px;background:var(--surface);border-top:1px solid var(--border);display:flex;gap:12px;}
+.btn-back{background:transparent;border:1.5px solid var(--border);border-radius:12px;color:var(--text-muted);font-family:var(--font);font-size:15px;font-weight:600;padding:14px 22px;cursor:pointer;flex-shrink:0;transition:border-color 0.12s,color 0.12s;display:flex;align-items:center;gap:6px;}
+.btn-back:hover{border-color:var(--border-med);color:var(--text);}
+.btn-next{flex:1;background:var(--green);border:none;border-radius:12px;color:#000;font-family:var(--font);font-size:16px;font-weight:800;padding:14px 24px;cursor:pointer;letter-spacing:0.02em;transition:background 0.12s,transform 0.08s;display:flex;align-items:center;justify-content:center;gap:8px;}
+.btn-next:hover{background:var(--green-dim);}
+.btn-next:active{transform:scale(0.98);}
+
+/* RED FLAG GATE */
+.rf-gate{flex:1;overflow-y:auto;padding:32px 24px;}
+.rf-icon-wrap{width:72px;height:72px;border-radius:50%;background:var(--red-bg);border:2px solid var(--red-border);display:flex;align-items:center;justify-content:center;margin:0 auto 24px;}
+.rf-gate h2{font-size:24px;font-weight:800;text-align:center;margin-bottom:12px;color:#f09595;}
+[data-theme="light"] .rf-gate h2{color:#c03030;}
+.rf-gate p{font-size:15px;color:var(--text-muted);text-align:center;line-height:1.6;margin-bottom:20px;}
+.rf-reason-card{background:var(--surface);border:1px solid var(--red-border);border-radius:14px;padding:16px 18px;margin-bottom:12px;display:flex;gap:14px;align-items:flex-start;}
+.rf-reason-icon{width:36px;height:36px;border-radius:10px;background:var(--red-bg);flex-shrink:0;display:flex;align-items:center;justify-content:center;}
+.rf-reason-icon svg{width:18px;height:18px;color:#f09595;}
+[data-theme="light"] .rf-reason-icon svg{color:#c03030;}
+.rf-reason-title{font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px;}
+.rf-reason-sub{font-size:13px;color:var(--text-muted);line-height:1.5;}
+.rf-gate-btns{display:flex;gap:12px;margin-top:24px;}
+.rf-continue-btn{flex:1;background:var(--surface);border:1.5px solid var(--border);border-radius:12px;color:var(--text-muted);font-family:var(--font);font-size:14px;font-weight:600;padding:14px 18px;cursor:pointer;text-align:center;}
+.rf-continue-btn:hover{border-color:var(--border-med);color:var(--text);}
+
+/* IMAGE UPLOAD */
+.img-upload-area{border:2px dashed var(--border-med);border-radius:16px;padding:32px 24px;text-align:center;cursor:pointer;transition:border-color 0.12s,background 0.12s;margin-top:6px;}
+.img-upload-area:hover{border-color:rgba(200,240,0,0.4);background:var(--green-bg);}
+.img-upload-area input{display:none;}
+.img-preview-wrap{margin-top:14px;}
+.img-preview{width:100%;max-height:260px;object-fit:contain;border-radius:12px;border:1px solid var(--border);}
+.img-remove-btn{margin-top:10px;background:transparent;border:1px solid var(--red-border);border-radius:8px;color:#f09595;font-family:var(--font);font-size:13px;padding:6px 14px;cursor:pointer;}
+[data-theme="light"] .img-remove-btn{color:#c03030;}
+
+/* SUMMARY */
+#summary-view{flex:1;overflow-y:auto;}
+.sum-header{padding:24px;border-bottom:1px solid var(--border);}
+.sum-patient-row{display:flex;align-items:center;gap:14px;margin-bottom:8px;}
+.sum-avatar{width:48px;height:48px;border-radius:50%;background:var(--blue-bg);color:var(--blue);font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;border:1px solid rgba(91,156,246,0.2);}
+.sum-name{font-size:20px;font-weight:800;}
+.sum-meta{font-size:13px;color:var(--text-muted);margin-top:2px;}
+.sum-flag-badge{margin-top:12px;display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;padding:6px 14px;border-radius:20px;}
+.flag-clear{background:rgba(100,200,120,0.12);color:#6dc87e;border:1px solid rgba(100,200,120,0.25);}
+.flag-red{background:var(--red-bg);color:#f09595;border:1px solid var(--red-border);}
+.sum-body{padding:24px;}
+
+.kpi-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:24px;}
+@media(min-width:600px){
+  .kpi-grid{grid-template-columns:repeat(3,1fr);gap:12px;}
+}
+.kpi-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px;}
+.kpi-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.09em;color:var(--text-muted);margin-bottom:6px;}
+.kpi-val{font-size:24px;font-weight:800;line-height:1;}
+.kpi-unit{font-size:12px;font-weight:400;color:var(--text-muted);}
+.kpi-bar{height:4px;border-radius:2px;margin-top:8px;background:var(--surface3);overflow:hidden;}
+.kpi-fill{height:100%;border-radius:2px;}
+
+.sum-section{margin-bottom:24px;}
+.sum-section-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-hint);margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid var(--border);}
+.sum-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;overflow:hidden;}
+.sum-row{display:flex;justify-content:space-between;align-items:flex-start;padding:12px 18px;gap:16px;border-bottom:1px solid var(--border);}
+.sum-row:last-child{border-bottom:none;}
+.sr-label{font-size:13px;color:var(--text-muted);flex-shrink:0;max-width:45%;line-height:1.4;padding-top:1px;}
+.sr-val{font-size:14px;font-weight:500;color:var(--text);text-align:right;line-height:1.4;}
+.chips-wrap{display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end;max-width:58%;}
+.chip{font-size:12px;padding:4px 10px;border-radius:20px;background:var(--surface2);color:var(--text-muted);border:1px solid var(--border);}
+.chip-g{background:var(--green-bg);color:var(--green);border-color:var(--green-border);}
+[data-theme="light"] .chip-g{color:#1060a8;}
+.chip-b{background:var(--blue-bg);color:var(--blue);border-color:rgba(91,156,246,0.25);}
+.quote-box{background:var(--surface2);border-left:3px solid var(--green);border-radius:0 12px 12px 0;padding:14px 18px;font-size:14px;color:var(--text-muted);font-style:italic;line-height:1.6;}
+[data-theme="light"] .quote-box{border-left-color:#1a7fd4;}
+.quote-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-hint);margin-bottom:8px;font-style:normal;}
+.goal-card{background:var(--green-bg);border:1px solid var(--green-border);border-radius:16px;padding:18px;display:flex;align-items:center;gap:14px;}
+.goal-icon{width:42px;height:42px;border-radius:12px;background:var(--green);flex-shrink:0;display:flex;align-items:center;justify-content:center;}
+.goal-icon svg{width:22px;height:22px;}
+.goal-text{font-size:15px;font-weight:700;color:var(--green);line-height:1.35;}
+.goal-sub{font-size:12px;color:rgba(200,240,0,0.6);margin-top:3px;}
+.scale-summary{display:flex;align-items:center;gap:12px;margin-top:6px;}
+.ss-num{font-size:26px;font-weight:800;min-width:34px;}
+.ss-track{flex:1;height:6px;background:var(--surface3);border-radius:3px;overflow:hidden;}
+.ss-fill{height:100%;border-radius:3px;}
+.red-flag-item{display:flex;gap:10px;align-items:flex-start;padding:12px 16px;background:var(--red-bg);border:1px solid var(--red-border);border-radius:12px;margin-bottom:8px;font-size:14px;color:#f09595;}
+[data-theme="light"] .red-flag-item{color:#c03030;}
+.red-flag-clear{display:flex;gap:10px;align-items:center;padding:12px 16px;background:rgba(100,200,120,0.08);border:1px solid rgba(100,200,120,0.2);border-radius:12px;font-size:14px;color:#6dc87e;}
+.sum-actions{display:flex;gap:12px;margin-top:28px;flex-wrap:wrap;}
+.act-btn{flex:1;min-width:160px;background:var(--surface);border:1.5px solid var(--border);border-radius:12px;color:var(--text-muted);font-family:var(--font);font-size:14px;font-weight:600;padding:14px 18px;cursor:pointer;text-align:left;transition:border-color 0.12s,color 0.12s;line-height:1.4;}
+.act-btn:hover{border-color:var(--border-med);color:var(--text);}
+.act-btn svg{vertical-align:-3px;margin-right:8px;}
+.act-btn-primary{background:var(--green);border-color:var(--green);color:#000;font-weight:800;}
+.act-btn-primary:hover{background:var(--green-dim);border-color:var(--green-dim);color:#000;}
+[data-theme="light"] .act-btn-primary{background:#1a7fd4;border-color:#1a7fd4;color:#fff;}
+[data-theme="light"] .act-btn-primary:hover{background:#1060a8;border-color:#1060a8;color:#fff;}
+
+/* summary image */
+.sum-photo{width:100%;max-height:280px;object-fit:contain;border-radius:12px;border:1px solid var(--border);display:block;margin-top:8px;}
+
+@media print{
+  body{background:#fff!important;color:#000!important;}
+  [data-theme="dark"] body,[data-theme="light"] body{background:#fff!important;color:#000!important;}
+  #app{max-width:100%;box-shadow:none;border:none;margin:0;}
+  #questionnaire-view,#registration-view,#registration-view2,#registration-view3,#rf-gate-view,#nav-bar,#red-flag-screening-view,.sum-actions,.theme-toggle{display:none!important;}
+  .app-header{position:static!important;background:#fff!important;border-bottom:1px solid #ccc!important;}
+  .header-title,.header-sub{color:#000!important;}
+  #summary-view{display:block!important;}
+  .sum-card,.kpi-card{border:1px solid #ccc!important;background:#fafafa!important;}
+  .quote-box{border-left-color:#333!important;background:#f5f5f5!important;}
+  .goal-card{background:#f0ffe0!important;border-color:#aad400!important;}
+  .kpi-val,.sr-val,.sum-name,.q-headline{color:#000!important;}
+  .sr-label,.sum-meta,.kpi-label,.kpi-unit{color:#555!important;}
+  .chip{background:#eee!important;color:#333!important;border-color:#ccc!important;}
+  .chip-g{background:#ddeeff!important;color:#1060a8!important;border-color:#b3d4f5!important;}
+  .chip-b{background:#e0ecff!important;color:#2255aa!important;}
+}
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- HEADER -->
+<div class="app-header" id="app-header">
+  <div class="header-logo">
+    <svg viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 2C8 2 5 5 5 8c0 4 3 6 3 10h8c0-4 3-6 3-10 0-3-3-6-7-6z"/>
+      <line x1="9" y1="21" x2="15" y2="21"/><line x1="10" y1="18" x2="14" y2="18"/>
+    </svg>
+  </div>
+  <div class="header-text">
+    <div class="header-title">MSK Podiatry Triage</div>
+    <div class="header-sub" id="header-sub">Foot &amp; Ankle Assessment</div>
+  </div>
+  <!-- THEME TOGGLE -->
+  <div class="theme-toggle" id="theme-toggle" title="Toggle light/dark mode">
+    <button class="theme-btn" id="btn-dark" onclick="setTheme('dark')" title="Dark mode">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12.79A9 9 0 1111.21 3a7 7 0 009.79 9.79z"/></svg>
+    </button>
+    <button class="theme-btn" id="btn-light" onclick="setTheme('light')" title="Light mode">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+    </button>
+  </div>
+  <div class="header-mode-badge badge-patient" id="mode-badge">Patient</div>
+</div>
+
+<!-- ── INITIAL POSTCODE VERIFICATION GATE ── -->
+<div id="postcode-gate-view" style="display:flex;flex-direction:column;flex:1">
+  <div style="flex:1;overflow-y:auto;padding:28px 24px 20px;">
+    <div class="section-tag" style="color:#5be8ff;background:rgba(91,232,255,0.08);border:1px solid rgba(91,232,255,0.2);">Eligibility</div>
+    <div class="q-headline">Podiatry service self-referral</div>
+    <div class="q-sub">You can self-refer to our service by completing the request for help form below. Please complete all the boxes in the form as fully as possible.</div>
+    
+    <div class="field-group" style="margin-top:20px;">
+      <div class="field-item">
+        <div class="field-label">Please enter your postcode to continue <span class="req">*</span></div>
+        <input class="field-input" id="initial_postcode" type="text" placeholder="enter a valid postcode" style="text-transform:uppercase;max-width:240px;margin-top:4px;" onkeypress="if(event.key==='Enter') verifyInitialPostcode()">
+        <div class="field-error" id="err_initial_postcode">Please enter a valid postcode</div>
+      </div>
+    </div>
+
+    <!-- OUT OF AREA WARNING BANNER -->
+    <div id="postcode_out_of_area_msg" class="warn-banner hidden" style="margin-top:20px;">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      <div>You must live in the Lanarkshire area to use this service. If you think there is an error please get in touch in 01698 753753.</div>
+    </div>
+  </div>
+
+  <div style="padding:16px 24px 24px;background:var(--surface);border-top:1px solid var(--border);display:flex;gap:12px;">
+    <button class="btn-next" onclick="verifyInitialPostcode()" style="flex:1;">Check Postcode <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9,18 15,12 9,6"/></svg></button>
+  </div>
+</div>
+
+<!-- ── RED FLAG SCREENING (IMMEDIATELY AFTER POSTCODE) ── -->
+<div id="red-flag-screening-view" class="hidden" style="flex-direction:column;flex:1">
+  <div style="flex:1;overflow-y:auto;padding:28px 24px 20px;">
+    <div class="section-tag" style="color:#f09595;background:rgba(226,75,74,0.1);border:1px solid rgba(226,75,74,0.25);">Safety Screening</div>
+    <div class="q-headline">Are any of the following present?</div>
+    <div class="q-sub">Select all that apply. These help us ensure your care is managed safely.</div>
+    
+    <div class="warn-banner">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      <div>If any of these are present, selecting them may indicate your symptoms are better managed by an urgent or different service. Please be as accurate as possible.</div>
+    </div>
+
+    <div class="options-list grid-opt" id="initial_rf_options_list"></div>
+    <div class="field-error" id="err_initial_rf" style="margin-top:10px;">Please select an option to continue</div>
+  </div>
+
+  <div style="padding:16px 24px 24px;background:var(--surface);border-top:1px solid var(--border);display:flex;gap:12px;">
+    <button class="btn-back" onclick="showPostcodeGate()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15,18 9,12 15,6"/></svg>Back</button>
+    <button class="btn-next" onclick="submitRedFlagScreening()" style="flex:1;">Continue <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9,18 15,12 9,6"/></svg></button>
+  </div>
+</div>
+
+<!-- ── REGISTRATION 1 ── -->
+<div id="registration-view" class="hidden" style="flex-direction:column;flex:1">
+  <div style="background:var(--surface);padding:12px 24px 16px;border-bottom:1px solid var(--border);">
+    <div style="display:flex;justify-content:space-between;margin-bottom:7px;">
+      <span style="font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);">Patient Details</span>
+      <span style="font-size:11px;color:var(--text-hint);">Step 1 of 3</span>
+    </div>
+    <div class="prog-track"><div class="prog-fill" style="width:33%"></div></div>
+  </div>
+  <div style="flex:1;overflow-y:auto;padding:28px 24px 20px;">
+    <div class="section-tag" style="color:#5be8ff;background:rgba(91,232,255,0.08);border:1px solid rgba(91,232,255,0.2);">Registration</div>
+    <div class="q-headline">Your details</div>
+    <div class="q-sub">Required fields are marked <span style="color:var(--red)">*</span> — please complete all before continuing.</div>
+    <div class="field-group">
+      <div class="field-item"><div class="field-label">Full name <span class="req">*</span></div><input class="field-input" id="reg_name" type="text" placeholder="e.g. Jamie Morrison" autocomplete="name"><div class="field-error" id="err_name">Please enter your full name</div></div>
+      <div class="field-item"><div class="field-label">Date of birth <span class="req">*</span></div><input class="field-input" id="reg_dob" type="date" autocomplete="bday"><div class="field-error" id="err_dob">Please enter your date of birth</div></div>
+      
+      <!-- Filling for someone else & relationship -->
+      <div class="field-item"><div class="field-label">Are you filling this form in for someone else? <span class="req">*</span></div>
+        <div class="options-list grid-opt" style="margin-top:6px;" id="someone_else_opts">
+          <div class="opt" onclick="setRegSomeoneElse('Yes',this.parentElement)" tabindex="0"><div class="opt-marker"><svg viewBox="0 0 12 12" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round"><polyline points="2,6 5,9 10,3"/></svg></div><span class="opt-label">Yes</span></div>
+          <div class="opt" onclick="setRegSomeoneElse('No',this.parentElement)" tabindex="0"><div class="opt-marker"><svg viewBox="0 0 12 12" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round"><polyline points="2,6 5,9 10,3"/></svg></div><span class="opt-label">No</span></div>
+        </div>
+        <div class="field-error" id="err_someone_else">Please select an option</div>
+      </div>
+
+      <div class="field-item hidden" id="relationship_container" style="margin-top:4px;"><div class="field-label">What is your relationship with the applicant? <span class="req">*</span></div>
+        <div class="options-list grid-opt" style="margin-top:6px;" id="relationship_opts">
+          <div class="opt" onclick="setReg('reg_relationship','Husband',this.parentElement)" tabindex="0"><div class="opt-marker"><svg viewBox="0 0 12 12" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round"><polyline points="2,6 5,9 10,3"/></svg></div><span class="opt-label">Husband</span></div>
+          <div class="opt" onclick="setReg('reg_relationship','Wife',this.parentElement)" tabindex="0"><div class="opt-marker"><svg viewBox="0 0 12 12" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round"><polyline points="2,6 5,9 10,3"/></svg></div><span class="opt-label">Wife</span></div>
+          <div class="opt" onclick="setReg('reg_relationship','Son',this.parentElement)" tabindex="0"><div class="opt-marker"><svg viewBox="0 0 12 12" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round"><polyline points="2,6 5,9 10,3"/></svg></div><span class="opt-label">Son</span></div>
+          <div class="opt" onclick="setReg('reg_relationship','Daughter',this.parentElement)" tabindex="0"><div class="opt-marker"><svg viewBox="0 0 12 12" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round"><polyline points="2,6 5,9 10,3"/></svg></div><span class="opt-label">Daughter</span></div>
+          <div class="opt" onclick="setReg('reg_relationship','Son in Law',this.parentElement)" tabindex="0"><div class="opt-marker"><svg viewBox="0 0 12 12" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round"><polyline points="2,6 5,9 10,3"/></svg></div><span class="opt-label">Son in Law</span></div>
+          <div class="opt" onclick="setReg('reg_relationship','Daughter in Law',this.parentElement)" tabindex="0"><div class="opt-marker"><svg viewBox="0 0 12 12" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round"><polyline points="2,6 5,9 10,3"/></svg></div><span class="opt-label">Daughter in Law</span></div>
+          <div class="opt" onclick="setReg('reg_relationship','Carer',this.parentElement)" tabindex="0"><div class="opt-marker"><svg viewBox="0 0 12 12" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round"><polyline points="2,6 5,9 10,3"/></svg></div><span class="opt-label">Carer</span></div>
+          <div class="opt" onclick="setReg('reg_relationship','Neighbour',this.parentElement)" tabindex="0"><div class="opt-marker"><svg viewBox="0 0 12 12" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round"><polyline points="2,6 5,9 10,3"/></svg></div><span class="opt-label">Neighbour</span></div>
+          <div class="opt" onclick="setReg('reg_relationship','Other',this.parentElement)" tabindex="0"><div class="opt-marker"><svg viewBox="0 0 12 12" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round"><polyline points="2,6 5,9 10,3"/></svg></div><span class="opt-label">Other</span></div>
+        </div>
+        <div class="field-error" id="err_relationship">Please select a relationship</div>
+      </div>
+
+      <div class="field-item"><div class="field-label">Address <span class="req">*</span></div><textarea class="field-input" id="reg_address" rows="2" placeholder="Street, town/city" style="resize:none;border-radius:12px;"></textarea><div class="field-error" id="err_address">Please enter your address</div></div>
+      <div class="field-item"><div class="field-label">Postcode <span class="req">*</span></div><input class="field-input" id="reg_postcode" type="text" placeholder="e.g. G77 5AB" autocomplete="postal-code" style="text-transform:uppercase;max-width:180px;"><div class="field-error" id="err_postcode">Please enter your postcode</div></div>
+      <div class="field-item"><div class="field-label">Telephone number <span class="req">*</span></div><input class="field-input" id="reg_tel" type="tel" placeholder="e.g. 07700 900123" autocomplete="tel"><div class="field-error" id="err_tel">Please enter your telephone number</div></div>
+      <div class="field-item"><div class="field-label">Email address</div><input class="field-input" id="reg_email" type="email" placeholder="e.g. name@email.com" autocomplete="email"></div>
+      <div class="field-item"><div class="field-label">GP practice <span class="req">*</span></div><input class="field-input" id="reg_gp" type="text" placeholder="Name of your GP practice"><div class="field-error" id="err_gp">Please enter your GP practice</div></div>
+    </div>
+  </div>
+  <div style="padding:16px 24px 24px;background:var(--surface);border-top:1px solid var(--border);display:flex;gap:12px;">
+    <button class="btn-next" onclick="goToReg2()" style="flex:1;">Continue <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9,18 15,12 9,6"/></svg></button>
+  </div>
+</div>
+
+<!-- ── REGISTRATION 2 ── -->
+<div id="registration-view2" class="hidden" style="flex-direction:column;flex:1">
+  <div style="background:var(--surface);padding:12px 24px 16px;border-bottom:1px solid var(--border);">
+    <div style="display:flex;justify-content:space-between;margin-bottom:7px;">
+      <span style="font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);">Administrative</span>
+      <span style="font-size:11px;color:var(--text-hint);">Step 2 of 3</span>
+    </div>
+    <div class="prog-track"><div class="prog-fill" style="width:66%"></div></div>
+  </div>
+  <div style="flex:1;overflow-y:auto;padding:28px 24px 20px;">
+    <div class="section-tag" style="color:#5be8ff;background:rgba(91,232,255,0.08);border:1px solid rgba(91,232,255,0.2);">Admin &amp; access</div>
+    <div class="q-headline">A few more details</div>
+    <div class="q-sub">These help us plan your appointment and communicate with you effectively.</div>
+    <div class="field-group">
+      <div class="field-item"><div class="field-label">Can we leave a voicemail? <span class="req">*</span></div>
+        <div class="options-list grid-opt" style="margin-top:6px;" id="vm_opts">
+          <div class="opt" onclick="setReg('reg_voicemail','Yes',this.parentElement)" tabindex="0"><div class="opt-marker"><svg viewBox="0 0 12 12" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round"><polyline points="2,6 5,9 10,3"/></svg></div><span class="opt-label">Yes</span></div>
+          <div class="opt" onclick="setReg('reg_voicemail','No',this.parentElement)" tabindex="0"><div class="opt-marker"><svg viewBox="0 0 12 12" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round"><polyline points="2,6 5,9 10,3"/></svg></div><span class="opt-label">No</span></div>
+        </div>
+        <div class="field-error" id="err_voicemail">Please select an option</div>
+      </div>
+      <div class="field-item" style="margin-top:10px;"><div class="field-label">Consent to check medical records? <span class="req">*</span></div>
+        <div class="options-list grid-opt" style="margin-top:6px;" id="consent_opts">
+          <div class="opt" onclick="setReg('reg_consent','Yes — I consent',this.parentElement)" tabindex="0"><div class="opt-marker"><svg viewBox="0 0 12 12" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round"><polyline points="2,6 5,9 10,3"/></svg></div><span class="opt-label">Yes — I consent</span></div>
+          <div class="opt" onclick="setReg('reg_consent','No — I do not consent',this.parentElement)" tabindex="0"><div class="opt-marker"><svg viewBox="0 0 12 12" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round"><polyline points="2,6 5,9 10,3"/></svg></div><span class="opt-label">No — I do not consent</span></div>
+        </div>
+        <div class="field-error" id="err_consent">Please select an option</div>
+      </div>
+      <div class="field-item" style="margin-top:10px;"><div class="field-label">Do you require an interpreter? <span class="req">*</span></div>
+        <div class="options-list grid-opt" style="margin-top:6px;" id="interp_opts">
+          <div class="opt" onclick="setRegInterpreter('Yes',this.parentElement)" tabindex="0"><div class="opt-marker"><svg viewBox="0 0 12 12" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round"><polyline points="2,6 5,9 10,3"/></svg></div><span class="opt-label">Yes</span></div>
+          <div class="opt" onclick="setRegInterpreter('No',this.parentElement)" tabindex="0"><div class="opt-marker"><svg viewBox="0 0 12 12" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round"><polyline points="2,6 5,9 10,3"/></svg></div><span class="opt-label">No</span></div>
+        </div>
+        <div class="field-error" id="err_interpreter">Please select an option</div>
+      </div>
+
+      <!-- LANGUAGE SELECTION DROPDOWN -->
+      <div class="field-item hidden" id="language_container" style="margin-top:10px;">
+        <div class="field-label">Please select language required <span class="req">*</span></div>
+        <select class="field-input" id="reg_language" style="margin-top:6px;" onchange="document.getElementById('err_language').classList.remove('show')">
+          <option value="">-- Select Language --</option>
+          <option value="Albanian">Albanian</option>
+          <option value="Amharic">Amharic</option>
+          <option value="Arabic">Arabic</option>
+          <option value="Azeri">Azeri</option>
+          <option value="Bengali">Bengali</option>
+          <option value="Bosnian">Bosnian</option>
+          <option value="Bulgarian">Bulgarian</option>
+          <option value="Burmese">Burmese</option>
+          <option value="Cantonese">Cantonese</option>
+          <option value="Czech">Czech</option>
+          <option value="Croatian">Croatian</option>
+          <option value="Dari">Dari</option>
+          <option value="Dutch">Dutch</option>
+          <option value="English">English</option>
+          <option value="Estonian">Estonian</option>
+          <option value="Farsi">Farsi</option>
+          <option value="French">French</option>
+          <option value="Georgian">Georgian</option>
+          <option value="German">German</option>
+          <option value="Greek">Greek</option>
+          <option value="Gujurati">Gujurati</option>
+          <option value="Hakka">Hakka</option>
+          <option value="Hebrew">Hebrew</option>
+          <option value="Hindi">Hindi</option>
+          <option value="Hungarian">Hungarian</option>
+          <option value="Indonesian">Indonesian</option>
+          <option value="Italian">Italian</option>
+          <option value="Korean">Korean</option>
+          <option value="Kurdish">Kurdish</option>
+          <option value="Latvian">Latvian</option>
+          <option value="Lingala">Lingala</option>
+          <option value="Lithuanian">Lithuanian</option>
+          <option value="Macedonian">Macedonian</option>
+          <option value="Mandarin">Mandarin</option>
+          <option value="Malay">Malay</option>
+          <option value="Mirpuri">Mirpuri</option>
+          <option value="Mongolian">Mongolian</option>
+          <option value="Nepali">Nepali</option>
+          <option value="Polish">Polish</option>
+          <option value="Portuguese">Portuguese</option>
+          <option value="Punjabi">Punjabi</option>
+          <option value="Pushto">Pushto</option>
+          <option value="Romanian">Romanian</option>
+          <option value="Russian">Russian</option>
+          <option value="Serbian">Serbian</option>
+          <option value="Sinhalese">Sinhalese</option>
+          <option value="Slovak">Slovak</option>
+          <option value="Slovenian">Slovenian</option>
+          <option value="Somali">Somali</option>
+          <option value="Spanish">Spanish</option>
+          <option value="Swahili">Swahili</option>
+          <option value="Tamil">Tamil</option>
+          <option value="Thai">Thai</option>
+          <option value="Telugu">Telugu</option>
+          <option value="Tigrinia">Tigrinia</option>
+          <option value="Turkish">Turkish</option>
+          <option value="Ukranian">Ukranian</option>
+          <option value="Urdu">Urdu</option>
+          <option value="Uzbeck">Uzbeck</option>
+          <option value="Vietnamese">Vietnamese</option>
+          <option value="Yoruba">Yoruba</option>
+        </select>
+        <div class="field-error" id="err_language">Please select a language</div>
+      </div>
+
+      <div class="field-item" style="margin-top:10px;"><div class="field-label">Able to travel outwith local area? <span class="req">*</span></div>
+        <div class="options-list grid-opt" style="margin-top:6px;" id="travel_opts">
+          <div class="opt" onclick="setReg('reg_travel','Yes',this.parentElement)" tabindex="0"><div class="opt-marker"><svg viewBox="0 0 12 12" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round"><polyline points="2,6 5,9 10,3"/></svg></div><span class="opt-label">Yes</span></div>
+          <div class="opt" onclick="setReg('reg_travel','No',this.parentElement)" tabindex="0"><div class="opt-marker"><svg viewBox="0 0 12 12" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round"><polyline points="2,6 5,9 10,3"/></svg></div><span class="opt-label">No</span></div>
+        </div>
+        <div class="field-error" id="err_travel">Please select an option</div>
+      </div>
+      <div class="field-item" style="margin-top:10px;"><div class="field-label">Able to attend a video appointment? <span class="req">*</span></div>
+        <div class="options-list grid-opt" style="margin-top:6px;" id="video_opts">
+          <div class="opt" onclick="setReg('reg_video','Yes',this.parentElement)" tabindex="0"><div class="opt-marker"><svg viewBox="0 0 12 12" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round"><polyline points="2,6 5,9 10,3"/></svg></div><span class="opt-label">Yes</span></div>
+          <div class="opt" onclick="setReg('reg_video','No',this.parentElement)" tabindex="0"><div class="opt-marker"><svg viewBox="0 0 12 12" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round"><polyline points="2,6 5,9 10,3"/></svg></div><span class="opt-label">No</span></div>
+        </div>
+        <div class="field-error" id="err_video">Please select an option</div>
+      </div>
+      <div class="field-item" style="margin-top:10px;"><div class="field-label">Any dates or days you are unavailable?</div>
+        <textarea class="field-input" id="reg_unavailable" rows="2" placeholder="e.g. Mondays, week of 10 Jul… (optional)" style="resize:none;border-radius:12px;margin-top:6px;background:var(--surface3);border:1.5px solid var(--border);color:var(--text);font-family:var(--font);font-size:15px;padding:14px 16px;"></textarea>
+      </div>
+    </div>
+  </div>
+  <div style="padding:16px 24px 24px;background:var(--surface);border-top:1px solid var(--border);display:flex;gap:12px;">
+    <button class="btn-back" onclick="showReg1()" style="display:flex;align-items:center;gap:6px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15,18 9,12 15,6"/></svg>Back</button>
+    <button class="btn-next" onclick="goToReg3()" style="flex:1;">Continue <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9,18 15,12 9,6"/></svg></button>
+  </div>
+</div>
+
+<!-- ── REGISTRATION 3 ── -->
+<div id="registration-view3" class="hidden" style="flex-direction:column;flex:1">
+  <div style="background:var(--surface);padding:12px 24px 16px;border-bottom:1px solid var(--border);">
+    <div style="display:flex;justify-content:space-between;margin-bottom:7px;">
+      <span style="font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);">Medical history</span>
+      <span style="font-size:11px;color:var(--text-hint);">Step 3 of 3</span>
+    </div>
+    <div class="prog-track"><div class="prog-fill" style="width:100%"></div></div>
+  </div>
+  <div style="flex:1;overflow-y:auto;padding:28px 24px 20px;">
+    <div class="section-tag" style="color:#b097ff;background:rgba(160,120,255,0.1);border:1px solid rgba(160,120,255,0.25);">Medical history</div>
+    <div class="q-headline">Health background</div>
+    <div class="q-sub">Select all conditions that apply, and list any current medications below.</div>
+    <div class="field-group">
+      <div class="field-item">
+        <div class="field-label">Diagnosed medical conditions &amp; allergies</div>
+        <div class="options-list grid-opt" style="margin-top:6px;" id="conditions_checklist"></div>
+      </div>
+      <div class="field-item" style="margin-top:12px;"><div class="field-label">Current medications</div><textarea class="field-input" id="reg_medications" rows="3" placeholder="List any medicines you currently take… (optional)" style="resize:none;border-radius:12px;margin-top:6px;background:var(--surface3);border:1.5px solid var(--border);color:var(--text);font-family:var(--font);font-size:15px;padding:14px 16px;"></textarea></div>
+    </div>
+  </div>
+  <div style="padding:16px 24px 24px;background:var(--surface);border-top:1px solid var(--border);display:flex;gap:12px;">
+    <button class="btn-back" onclick="showReg2()" style="display:flex;align-items:center;gap:6px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15,18 9,12 15,6"/></svg>Back</button>
+    <button class="btn-next" onclick="startQuestionnaire()" style="flex:1;">Start questionnaire <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9,18 15,12 9,6"/></svg></button>
+  </div>
+</div>
+
+<!-- ── RED FLAG REJECTION GATE ── -->
+<div id="rf-gate-view" class="hidden" style="flex-direction:column;flex:1">
+  <div class="rf-gate">
+    <div class="rf-icon-wrap">
+      <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#E24B4A" stroke-width="2.5" stroke-linecap="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+    </div>
+    <h2>MSK Podiatry cannot accept your referral</h2>
+    <p>Based on your answers, your symptoms require a different service. MSK Podiatry specialises in long-term musculoskeletal conditions and is not able to accept referrals for the following:</p>
+    <div id="rf-reasons-list"></div>
+    <p style="margin-bottom:0;font-size:14px;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px 18px;text-align:left;line-height:1.7;color:var(--text-muted);">
+      If you are unsure, please contact <strong style="color:var(--text)">NHS 24 on 111</strong> for advice, attend your nearest <strong style="color:var(--text)">Minor Injuries Unit or A&amp;E</strong> for injuries, or speak to your <strong style="color:var(--text)">GP</strong> for lumps, bumps, or surgical follow-up.
+    </p>
+    <div class="rf-gate-btns">
+      <button class="rf-continue-btn" onclick="overrideRfGate()">My selections were incorrect — go back</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── QUESTIONNAIRE ── -->
+<div id="questionnaire-view" class="hidden" style="flex-direction:column;flex:1">
+  <div id="progress-wrap">
+    <div class="prog-meta">
+      <span class="prog-section" id="prog-section">EFAS Score</span>
+      <span class="prog-count" id="prog-count">1 / 27</span>
+    </div>
+    <div class="prog-track"><div class="prog-fill" id="prog-fill" style="width:3.7%"></div></div>
+  </div>
+  <div id="question-area" style="flex:1;overflow-y:auto"></div>
+  <div id="nav-bar">
+    <button class="btn-back hidden" id="btn-back" onclick="prevQ()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15,18 9,12 15,6"/></svg>Back
+    </button>
+    <button class="btn-next" id="btn-next" onclick="nextQ()">Continue <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9,18 15,12 9,6"/></svg></button>
+  </div>
+</div>
+
+<!-- ── SUMMARY ── -->
+<div id="summary-view" class="hidden"></div>
+
+</div><!-- #app -->
+
+<script>
+// ── THEME ──────────────────────────────────────────────────────────
+function setTheme(t) {
+  document.documentElement.setAttribute('data-theme', t);
+  document.getElementById('btn-dark').classList.toggle('active', t==='dark');
+  document.getElementById('btn-light').classList.toggle('active', t==='light');
+  localStorage.setItem('msk_theme', t);
+}
+(function(){
+  const saved = localStorage.getItem('msk_theme')||'dark';
+  setTheme(saved);
+})();
+
+/* ── LANARKSHIRE POSTCODE VALIDATOR ────────────────────────────── */
+const LANARKSHIRE_OUTCODES = new Set([
+  "ML1","ML2","ML3","ML4","ML5","ML6","ML7","ML8","ML9","ML10","ML11","ML12",
+  "G65","G67","G68","G69","G71","G72","G73","G74","G75"
+]);
+const BORDER_POSTCODE_SECTORS = new Set([
+  "EH46 7", "EH47 9", "EH55 8", "FK1 3", "FK4 2", "FK6 5",
+  "G33 6", "G44 4", "G64 1", "G66 5", "G66 8", "G70 5", "G70 6",
+  "G76 8", "G76 9", "G79 1"
+]);
+
+function formatPostcode(pc) {
+  if (!pc) return '';
+  const clean = pc.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
+  if (clean.length < 5 || clean.length > 7) return '';
+  return clean.slice(0, clean.length - 3) + ' ' + clean.slice(clean.length - 3);
+}
+
+function verifyInitialPostcode() {
+  const input = document.getElementById('initial_postcode');
+  const errEl = document.getElementById('err_initial_postcode');
+  const outOfAreaMsg = document.getElementById('postcode_out_of_area_msg');
+  
+  const rawVal = input ? input.value.trim() : '';
+  const formatted = formatPostcode(rawVal);
+  
+  if (!formatted || formatted.length < 5) {
+    if (errEl) errEl.classList.add('show');
+    if (outOfAreaMsg) outOfAreaMsg.classList.add('hidden');
+    return;
+  }
+  
+  const parts = formatted.split(' ');
+  const outcode = parts[0];
+  const sector = outcode + ' ' + parts[1].charAt(0);
+  
+  const isLanarkshire = LANARKSHIRE_OUTCODES.has(outcode) || BORDER_POSTCODE_SECTORS.has(sector);
+  
+  if (isLanarkshire) {
+    if (errEl) errEl.classList.remove('show');
+    if (outOfAreaMsg) outOfAreaMsg.classList.add('hidden');
+    
+    answers.reg_postcode = formatted;
+    const regPostcodeInp = document.getElementById('reg_postcode');
+    if (regPostcodeInp) regPostcodeInp.value = formatted;
+    
+    showRedFlagScreening();
+  } else {
+    if (errEl) errEl.classList.remove('show');
+    if (outOfAreaMsg) outOfAreaMsg.classList.remove('hidden');
+  }
+}
+
+function showPostcodeGate() {
+  hideAll();
+  const pg = document.getElementById('postcode-gate-view');
+  if (pg) { pg.classList.remove('hidden'); pg.style.display = 'flex'; }
+}
+
+/* ── RED FLAG OPTIONS ────────────────────────────────────────────── */
+const RED_FLAG_ITEMS = [
+  { name: 'Recent significant injury or trauma', code: '417746004' },
+  { name: 'Sudden inability to weight bear', code: '298322009' },
+  { name: 'Hot, red, swollen foot or ankle', code: '298013008' },
+  { name: 'Fever or feeling generally unwell', code: '386661006' },
+  { name: 'Unexplained weight loss', code: '422868003' },
+  { name: 'Severe night pain', code: '274667000' },
+  { name: 'Previous cancer', code: '160903001' },
+  { name: 'New weakness/numbness in your foot and are tripping up on it or dragging it when walking', code: '298314008' },
+  { name: 'Non-identified lump, bump or lesion on the foot or ankle', code: '282110008' },
+  { name: 'Recent foot or ankle surgery', code: '172108008' }
+];
+
+function initRedFlagScreeningUI() {
+  const container = document.getElementById('initial_rf_options_list');
+  if (!container) return;
+  let html = RED_FLAG_ITEMS.map(item => {
+    const safeVal = item.name.replace(/"/g, '&quot;');
+    const isSel = (answers['red_flags']||[]).includes(item.name);
+    return `<div class="opt sq ${isSel?'selected':''}" data-val="${safeVal}" onclick="toggleInitialRfOption('${safeVal}', this)">
+      <div class="opt-marker"><svg viewBox="0 0 12 12" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round"><polyline points="2,6 5,9 10,3"/></svg></div>
+      <span class="opt-label">${item.name}</span>
+    </div>`;
+  }).join('');
+  
+  const noneSel = (answers['red_flags']||[]).includes('__none__');
+  html += `<div class="opt sq none-opt ${noneSel?'selected':''}" data-val="__none__" onclick="toggleInitialRfOption('__none__', this)">
+    <div class="opt-marker"><svg viewBox="0 0 12 12" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round"><polyline points="2,6 5,9 10,3"/></svg></div>
+    <span class="opt-label">None of the above</span>
+  </div>`;
+  
+  container.innerHTML = html;
+}
+
+function toggleInitialRfOption(val, el) {
+  if (!answers['red_flags']) answers['red_flags'] = [];
+  const errEl = document.getElementById('err_initial_rf');
+  if (errEl) errEl.classList.remove('show');
+
+  if (val === '__none__') {
+    answers['red_flags'] = ['__none__'];
+  } else {
+    const nIdx = answers['red_flags'].indexOf('__none__');
+    if (nIdx > -1) answers['red_flags'].splice(nIdx, 1);
+    
+    const idx = answers['red_flags'].indexOf(val);
+    if (idx > -1) answers['red_flags'].splice(idx, 1);
+    else answers['red_flags'].push(val);
+  }
+
+  const container = document.getElementById('initial_rf_options_list');
+  container.querySelectorAll('.opt').forEach(optEl => {
+    const oVal = optEl.dataset.val;
+    const sel = answers['red_flags'].includes(oVal);
+    optEl.classList.toggle('selected', sel);
+  });
+}
+
+function showRedFlagScreening() {
+  hideAll();
+  initRedFlagScreeningUI();
+  const rfView = document.getElementById('red-flag-screening-view');
+  if (rfView) { rfView.classList.remove('hidden'); rfView.style.display = 'flex'; }
+}
+
+function submitRedFlagScreening() {
+  const sel = answers['red_flags'] || [];
+  const errEl = document.getElementById('err_initial_rf');
+  if (sel.length === 0) {
+    if (errEl) errEl.classList.add('show');
+    return;
+  }
+  if (errEl) errEl.classList.remove('show');
+
+  if (sel.length > 0 && sel[0] !== '__none__') {
+    if (checkRedFlagGate(sel)) {
+      showRfGate();
+      return;
+    }
+  }
+
+  hideAll();
+  const regView = document.getElementById('registration-view');
+  if (regView) { regView.classList.remove('hidden'); regView.style.display = 'flex'; }
+}
+
+/* ── HEALTH CONDITIONS ───────────────────────────────────────────── */
+const HEALTH_CONDITIONS = [
+  { name: "Achilles rupture", snomed: "263223000" },
+  { name: "Angina", snomed: "194828000" },
+  { name: "Ankylosing spondylitis", snomed: "16507009" },
+  { name: "Anxiety", snomed: "197480006" },
+  { name: "Asthma", snomed: "195967001" },
+  { name: "Atrial fibrillation", snomed: "49436004" },
+  { name: "Attention deficit hyperactivity disorder (ADHD)", snomed: "406506008" },
+  { name: "Autism", snomed: "408856003" },
+  { name: "Back Pain", snomed: "161891005" },
+  { name: "Bladder cancer", snomed: "399068003" },
+  { name: "Bowel cancer", snomed: "363406005" },
+  { name: "Breast cancer", snomed: "254837009" },
+  { name: "Cellulitis", snomed: "128045006" },
+  { name: "Charcot foot", snomed: "81703006" },
+  { name: "Charcot Marie Tooth Disease", snomed: "128302006" },
+  { name: "Chilblains", snomed: "37869000" },
+  { name: "Chronic Kidney disease", snomed: "709044004" },
+  { name: "Chronic Obstructive Pulmonary Disease (COPD)", snomed: "13645005" },
+  { name: "Coronary heart disease", snomed: "53741008" },
+  { name: "Crohn’s disease", snomed: "34000006" },
+  { name: "Dementia", snomed: "52448006" },
+  { name: "Depression", snomed: "35489007" },
+  { name: "Epilepsy", snomed: "84757009" },
+  { name: "Fibromyalgia", snomed: "39148000" },
+  { name: "Foot drop", snomed: "202482002" },
+  { name: "Gastro-oesophageal reflux disease (Acid reflux)", snomed: "235595009" },
+  { name: "Gout", snomed: "239859002" },
+  { name: "Haemochromatosis", snomed: "25488008" },
+  { name: "Heart attack", snomed: "22298006" },
+  { name: "Hepatitis", snomed: "128241005" },
+  { name: "Hiatus hernia", snomed: "266442000" },
+  { name: "High blood pressure (Hypertension)", snomed: "38341003" },
+  { name: "High cholesterol", snomed: "55822004" },
+  { name: "Hip osteoarthritis", snomed: "239872000" },
+  { name: "HIV and Aids", snomed: "86406008" },
+  { name: "Idiopathic toe walker", snomed: "203078009" },
+  { name: "Incontinence", snomed: "165232002" },
+  { name: "Joint Hypermobility", snomed: "201423000" },
+  { name: "Knee osteoarthritis", snomed: "239873007" },
+  { name: "Leg length discrepancy", snomed: "298380001" },
+  { name: "Leg ulcer", snomed: "283422003" },
+  { name: "Lung cancer", snomed: "254637007" },
+  { name: "Multiple Sclerosis", snomed: "24700007" },
+  { name: "Osteoarthritis", snomed: "396275006" },
+  { name: "Osteoporosis", snomed: "64859007" },
+  { name: "Peripheral neuropathy", snomed: "386033004" },
+  { name: "Polio", snomed: "398102009" },
+  { name: "Polymyalgia rheumatica", snomed: "57057002" },
+  { name: "Post-traumatic stress disorder (PTSD)", snomed: "47505003" },
+  { name: "Previous broken ankle", snomed: "208322008" },
+  { name: "Previous broken toe", snomed: "208361008" },
+  { name: "Prostrate cancer", snomed: "254900004" },
+  { name: "Psoriasis", snomed: "9014002" },
+  { name: "Psoriatic arthritis", snomed: "156370009" },
+  { name: "Pulmonary embolism", snomed: "59282003" },
+  { name: "Raynauds", snomed: "266261006" },
+  { name: "Rheumatoid arthritis", snomed: "69896004" },
+  { name: "Sciatica", snomed: "23060006" },
+  { name: "Scoliosis", snomed: "298382003" },
+  { name: "Sepsis", snomed: "91302008" },
+  { name: "Sjogren’s syndrome", snomed: "23502006" },
+  { name: "Skin cancer", snomed: "372130007" },
+  { name: "Soft tissue sarcoma", snomed: "188044000" },
+  { name: "Spina bifida", snomed: "34538000" },
+  { name: "Stroke", snomed: "230690007" },
+  { name: "Thyroid issues", snomed: "14304000" },
+  { name: "Transcient ischaemic attack", snomed: "266257000" },
+  { name: "Tuberculosis", snomed: "56717001" },
+  { name: "Ulcerative colitis", snomed: "64766004" },
+  { name: "Varicose veins", snomed: "128060009" },
+  { name: "Vitamin b12 or folate deficiency", snomed: "190268003" }
+];
+
+function initConditionsChecklist() {
+  const container = document.getElementById('conditions_checklist');
+  if(!container) return;
+  container.innerHTML = HEALTH_CONDITIONS.map(item => {
+    const safeCond = item.name.replace(/"/g, '&quot;');
+    return `<div class="opt sq" data-qid="reg_conditions_list" data-val="${safeCond}" data-snomed="${item.snomed}" data-multi="true" role="checkbox" aria-checked="false" tabindex="0" onclick="handleConditionSelect('${safeCond}', this)">
+      <div class="opt-marker"><svg viewBox="0 0 12 12" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round"><polyline points="2,6 5,9 10,3"/></svg></div>
+      <span class="opt-label">${item.name}</span>
+    </div>`;
+  }).join('');
+}
+
+function handleConditionSelect(cond, el) {
+  if(!answers['reg_conditions_list']) answers['reg_conditions_list']=[];
+  const idx = answers['reg_conditions_list'].indexOf(cond);
+  if(idx > -1) {
+    answers['reg_conditions_list'].splice(idx, 1);
+    el.classList.remove('selected');
+    el.setAttribute('aria-checked', 'false');
+  } else {
+    answers['reg_conditions_list'].push(cond);
+    el.classList.add('selected');
+    el.setAttribute('aria-checked', 'true');
+  }
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  initConditionsChecklist();
+});
+
+// ── RED FLAG GATE CHECK ───────────────────────────────────────────
+const RF_RULES = [
+  {
+    flags:['Recent significant injury or trauma','Sudden inability to weight bear'],
+    title:'Recent injury, fracture or rupture',
+    sub:'Acute injuries, fractures, and tendon ruptures require urgent assessment. MSK Podiatry does not accept referrals for recent trauma.',
+    action:'Please attend A&amp;E or your nearest Minor Injuries Unit, or call NHS 24 on 111. Inability to bear weight often points to a fracture, severe sprain, or major rupture that needs an A&amp;E or urgent care referral, not a podiatrist.'
+  },
+  {
+    flags:['Hot, red, swollen foot or ankle'],
+    title:'Signs of acute infection or inflammatory flare',
+    sub:'A hot, red, swollen joint may indicate infection (septic arthritis) or acute gout, both requiring prompt medical review.',
+    action:'Please contact your GP urgently or attend A&amp;E if severe.'
+  },
+  {
+    flags:['Fever or feeling generally unwell'],
+    title:'Systemic illness with musculoskeletal symptoms',
+    sub:'Fever combined with joint or foot symptoms may indicate a systemic or infectious cause.',
+    action:'Please contact your GP or call NHS 24 on 111.'
+  },
+  {
+    flags:['Previous cancer'],
+    title:'History of cancer',
+    sub:'Foot and ankle symptoms in patients with a cancer history require investigation to exclude secondary disease before MSK podiatry assessment.',
+    action:'Please speak to your GP or oncology team for appropriate referral.'
+  },
+  {
+    flags:['Unexplained weight loss','Severe night pain'],
+    title:'Possible serious pathology',
+    sub:'Unexplained weight loss and severe night pain are potential indicators of serious underlying conditions.',
+    action:'Please contact your GP promptly for further investigation.'
+  },
+  {
+    flags:['New weakness/numbness in your foot and are tripping up on it or dragging it when walking'],
+    title:'New foot weakness or numbness',
+    sub:'New or acute nerve weakness/numbness causing tripping or foot dragging requires urgent medical or neurological evaluation.',
+    action:'Please attend A&amp;E, a Minor Injuries Unit, call NHS 24 on 111, or contact neurology.'
+  },
+  {
+    flags:['Non-identified lump, bump or lesion on the foot or ankle'],
+    title:'Undiagnosed lump, bump or lesion',
+    sub:'MSK Podiatry cannot accept referrals for undiagnosed lumps, bumps or lesions. These require investigation before onward referral.',
+    action:'Please contact your GP, who can examine the area and this may require an ultrasound to identify the lesion or to refer to orthopaedics or dermatology as appropriate.'
+  },
+  {
+    flags:['Recent foot or ankle surgery'],
+    title:'Recent foot or ankle surgery',
+    sub:'Post-surgical patients should be reviewed by the operating surgical team before referral to MSK Podiatry.',
+    action:'Please contact your surgical team or GP for post-operative follow-up.'
+  }
+];
+
+function checkRedFlagGate(selectedFlags) {
+  if (!selectedFlags || selectedFlags.length===0 || selectedFlags[0]==='__none__') return false;
+  const reasons = [];
+  RF_RULES.forEach(rule => {
+    if (rule.flags.some(f => selectedFlags.includes(f))) {
+      if (!reasons.find(r=>r.title===rule.title)) reasons.push(rule);
+    }
+  });
+  if (reasons.length === 0) return false;
+
+  const list = document.getElementById('rf-reasons-list');
+  list.innerHTML = reasons.map(r => `
+    <div class="rf-reason-card">
+      <div class="rf-reason-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/></svg></div>
+      <div>
+        <div class="rf-reason-title">${r.title}</div>
+        <div class="rf-reason-sub">${r.sub}<br><strong style="color:var(--text)">${r.action}</strong></div>
+      </div>
+    </div>`).join('');
+  return true;
+}
+
+function showRfGate() {
+  hideAll();
+  const g = document.getElementById('rf-gate-view');
+  g.classList.remove('hidden');
+  g.style.display='flex';
+}
+function overrideRfGate() {
+  answers['red_flags'] = [];
+  showRedFlagScreening();
+}
+
+// ── IMAGE UPLOAD ────────────────────────────────────────────────────
+let attachedImageDataURL = null;
+function handleImageUpload(input) {
+  const file = input.files[0];
+  if (!file) return;
+  if (!file.type.startsWith('image/')) { alert('Please select an image file.'); return; }
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    attachedImageDataURL = e.target.result;
+    const prev = document.getElementById('img-preview');
+    const wrap = document.getElementById('img-preview-wrap');
+    if (prev) prev.src = attachedImageDataURL;
+    if (wrap) wrap.classList.remove('hidden');
+    const area = document.getElementById('img-upload-area');
+    if (area) area.style.display='none';
+  };
+  reader.readAsDataURL(file);
+}
+function removeImage() {
+  attachedImageDataURL = null;
+  const wrap = document.getElementById('img-preview-wrap');
+  const area = document.getElementById('img-upload-area');
+  const inp = document.getElementById('img-file-input');
+  if (wrap) wrap.classList.add('hidden');
+  if (area) area.style.display='';
+  if (inp) inp.value='';
+}
+
+// ── QUESTIONS & SNOMED CT MAPPINGS ───────────────────────────────────
+const EFAS_QUESTIONS = [
+  {id:'efas1',snomed:'274667000',section:'EFAS Score',type:'efas',headline:'Do you have pain in your foot and/or ankle at rest?',minLabel:'Always (0)',maxLabel:'Never (4)'},
+  {id:'efas2',snomed:'282094002',section:'EFAS Score',type:'efas',headline:'How far can you walk before pain starts?',minLabel:'Impossible (0)',maxLabel:'No limitation (4)'},
+  {id:'efas3',snomed:'22325002',section:'EFAS Score',type:'efas',headline:'How much has your gait changed because of your problem?',minLabel:'Extreme change (0)',maxLabel:'No change (4)'},
+  {id:'efas4',snomed:'282098004',section:'EFAS Score',type:'efas',headline:'Do you have difficulty walking on uneven surfaces?',minLabel:'Always (0)',maxLabel:'Never (4)'},
+  {id:'efas5',snomed:'278414003',section:'EFAS Score',type:'efas',headline:'Do you have pain in your foot and/or ankle when walking?',minLabel:'Always (0)',maxLabel:'Never (4)'},
+  {id:'efas6',snomed:'278415002',section:'EFAS Score',type:'efas',headline:'How often do you have pain during physical activity?',minLabel:'Always (0)',maxLabel:'Never (4)'}
+];
+const EFAS_VAL_LABELS=['Always','','','','Never'];
+const EFAS_WALK_LABELS=['Impossible','','','','No limitation'];
+const EFAS_GAIT_LABELS=['Extreme change','','','','No change'];
+function efasLabel(q,v){if(q.id==='efas2')return EFAS_WALK_LABELS[v];if(q.id==='efas3')return EFAS_GAIT_LABELS[v];return EFAS_VAL_LABELS[v];}
+function efasColor(v){return v>=3?'#6dc87e':v>=2?'#f5a623':'#E24B4A';}
+
+const QUESTIONS = [
+  ...EFAS_QUESTIONS,
+  {
+    id:'side',
+    snomed:'272741003',
+    section:'Location',
+    type:'single',
+    headline:'Which side is affected?',
+    options:['Left','Right','Both'],
+    snomedOptions:{ 'Left':'23967004', 'Right':'78067005', 'Both':'51440002' }
+  },
+  {
+    id:'location',
+    snomed:'362240005',
+    section:'Location',
+    type:'multi',
+    headline:'Where is your problem located?',
+    sub:'Select all that apply.',
+    options:['Heel','Arch','Midfoot','Big toe','Lesser toes','Forefoot','Ankle (inside)','Ankle (outside)','Achilles tendon','Calf','Other'],
+    snomedOptions:{
+      'Heel':'298014002','Arch':'298015001','Midfoot':'298016000','Big toe':'182103009',
+      'Lesser toes':'182104003','Forefoot':'298017009','Ankle (inside)':'298018004',
+      'Ankle (outside)':'298019007','Achilles tendon':'181604005','Calf':'298020001','Other':'74964007'
+    }
+  },
+  {
+    id:'duration',
+    snomed:'424850005',
+    section:'History',
+    type:'single',
+    headline:'How long have symptoms been present?',
+    options:['Less than 6 weeks','6–12 weeks','3–6 months','6–12 months','More than 12 months'],
+    snomedOptions:{
+      'Less than 6 weeks':'373933003',
+      '6–12 weeks':'373935005',
+      '3–6 months':'90734009',
+      '6–12 months':'90734009',
+      'More than 12 months':'90734009'
+    }
+  },
+  {
+    id:'referral_reason',
+    snomed:'722742002',
+    section:'Your goals',
+    type:'multi',
+    headline:'Why have you come to MSK Podiatry today?',
+    sub:'Select all that apply.',
+    options:['Pain relief','Diagnosis','Treatment advice','Return to sport','Return to work','Improved walking','Prevent surgery','Second opinion','Other'],
+    snomedOptions:{
+      'Pain relief':'278414003','Diagnosis':'308292007','Treatment advice':'409073007',
+      'Return to sport':'310898005','Return to work':'310899002','Improved walking':'282094002',
+      'Prevent surgery':'416200000','Second opinion':'308292007','Other':'74964007'
+    }
+  },
+  {
+    id:'cause_belief',
+    snomed:'225358003',
+    section:'Your beliefs',
+    type:'multi',
+    headline:'What do you think is causing your problem?',
+    options:['Overuse','Injury','Arthritis','Poor footwear','Flat feet','High arches','Ageing','Weight','Previous injury','I don\'t know'],
+    snomedOptions:{
+      'Overuse':'24259000','Injury':'417746004','Arthritis':'3723001','Poor footwear':'229845001',
+      'Flat feet':'53226007','High arches':'7244005','Ageing':'418470000','Weight':'162864005',
+      'Previous injury':'275272006','I don\'t know':'261665006'
+    }
+  },
+  {
+    id:'avoided',
+    snomed:'160910001',
+    section:'Impact',
+    type:'multi',
+    headline:'Activities stopped due to worry about worsening?',
+    sub:'Select all that apply.',
+    options:['Walking','Running','Exercise','Gym','Stairs','Work activities','Other'],
+    snomedOptions:{
+      'Walking':'88383001','Running':'22723002','Exercise':'229065009','Gym':'229065009',
+      'Stairs':'282098004','Work activities':'310899002','Other':'74964007'
+    },
+    none:'None — I haven\'t stopped anything'
+  },
+  {
+    id:'movement_belief',
+    snomed:'225358003',
+    section:'Your beliefs',
+    type:'single',
+    headline:'Do you think movement is helping or harming you?',
+    options:['Mostly helping','Mostly harming','Unsure'],
+    snomedOptions:{ 'Mostly helping':'260385009', 'Mostly harming':'10828004', 'Unsure':'82334004' }
+  },
+  {
+    id:'treatments',
+    snomed:'277132007',
+    section:'History',
+    type:'multi',
+    headline:'What treatments have you already tried?',
+    options:['Exercises','Orthoses','Physiotherapy','Podiatry','Steroid injection','Shockwave therapy','Medication','Surgery','None'],
+    snomedOptions:{
+      'Exercises':'229065009','Orthoses':'229828003','Physiotherapy':'91251000',
+      'Podiatry':'20583008','Steroid injection':'304533001','Shockwave therapy':'429188001',
+      'Medication':'182832007','Surgery':'172108008','None':'260413007'
+    },
+    followups:[{key:'tx_helped',label:'Which treatment helped the most?'},{key:'tx_least',label:'Which treatment helped the least?'}]
+  },
+  {
+    id:'limited',
+    snomed:'363491008',
+    section:'Impact',
+    type:'multi',
+    headline:'Which activities are most limited by your condition?',
+    options:['Walking','Running','Exercise','Work','Standing','Stairs','Hobbies','Sleep'],
+    snomedOptions:{
+      'Walking':'88383001','Running':'22723002','Exercise':'229065009','Work':'310899002',
+      'Standing':'249857004','Stairs':'282098004','Hobbies':'229065009','Sleep':'248220002'
+    },
+    followups:[{key:'priority_activity',label:'Which would you most like to improve first?'}]
+  },
+  {id:'confidence_improve',snomed:'225358003',section:'Mindset',type:'scale',headline:'How confident are you this problem can improve?',sub:'0 = Not at all confident · 10 = Completely confident',min:0,max:10},
+  {
+    id:'recovery_time',
+    snomed:'260385009',
+    section:'Expectations',
+    type:'single',
+    headline:'How long do you expect recovery to take?',
+    options:['Less than 2 weeks','2–6 weeks','6–12 weeks','3–6 months','More than 6 months','Unsure'],
+    snomedOptions:{ 'Less than 2 weeks':'373933003', '2–6 weeks':'373935005', '3–6 months':'90734009', 'More than 6 months':'90734009', 'Unsure':'82334004' }
+  },
+  {
+    id:'treatment_pref',
+    snomed:'225358003',
+    section:'Preferences',
+    type:'multi',
+    headline:'What treatment do you think would help most?',
+    options:['Education and advice','Exercises','Orthoses','Footwear modification','Hands-on treatment','Injection','Surgery','Unsure'],
+    snomedOptions:{
+      'Education and advice':'409073007','Exercises':'229065009','Orthoses':'229828003',
+      'Footwear modification':'229845001','Hands-on treatment':'229562000','Injection':'304533001',
+      'Surgery':'172108008','Unsure':'82334004'
+    }
+  },
+  {
+    id:'barriers',
+    snomed:'225358003',
+    section:'Barriers',
+    type:'multi',
+    headline:'What might make rehabilitation difficult?',
+    options:['Lack of time','Pain during exercise','Fear of causing damage','Forgetfulness','Motivation','Work commitments','Caring responsibilities','Unsure whether it will help','Other'],
+    snomedOptions:{
+      'Lack of time':'310899002','Pain during exercise':'278415002','Fear of causing damage':'248232002',
+      'Forgetfulness':'247663003','Motivation':'225358003','Work commitments':'310899002',
+      'Caring responsibilities':'310899002','Unsure whether it will help':'82334004','Other':'74964007'
+    },
+    freetext:{key:'barriers_other',label:'Anything else? (optional)',placeholder:'Tell us more…'}
+  },
+  {id:'importance',snomed:'225358003',section:'Motivation',type:'scale',headline:'How important is improving this problem right now?',sub:'0 = Not important · 10 = Extremely important',min:0,max:10,followups:[{key:'importance_why',label:'Why that number and not lower?'}]},
+  {id:'self_efficacy',snomed:'225358003',section:'Motivation',type:'scale',headline:'How confident you can follow a treatment plan?',sub:'0 = Not confident · 10 = Very confident',min:0,max:10,followups:[{key:'self_eff_boost',label:'What would help move you one point higher?'}]},
+  {id:'one_goal',snomed:'225358003',section:'Your goals',type:'freetext',headline:'If you could only improve one thing in 3 months, what would it be?',sub:'e.g. Walk the dog · Complete a Parkrun · Work a full shift · Climb stairs',placeholder:'Describe your goal…',key:'one_goal_text'},
+  {
+    id:'activity_level',
+    snomed:'228449008',
+    section:'Activity',
+    type:'single',
+    headline:'Which best describes your typical week?',
+    options:['Mostly sitting','Light walking','Standing most of the day','Heavy manual work','Recreational exercise','Competitive sport'],
+    snomedOptions:{
+      'Mostly sitting':'228449008','Light walking':'88383001','Standing most of the day':'249857004',
+      'Heavy manual work':'310899002','Recreational exercise':'229065009','Competitive sport':'310898005'
+    }
+  },
+  {
+    id:'steps',
+    snomed:'228449008',
+    section:'Activity',
+    type:'single',
+    headline:'How active are you currently?',
+    options:['Under 2,000 steps/day','2,000–5,000 steps/day','5,000–8,000 steps/day','8,000–12,000 steps/day','Over 12,000 steps/day'],
+    snomedOptions:{
+      'Under 2,000 steps/day':'228449008','2,000–5,000 steps/day':'88383001',
+      '5,000–8,000 steps/day':'88383001','8,000–12,000 steps/day':'88383001','Over 12,000 steps/day':'229065009'
+    }
+  },
+  {
+    id:'activities',
+    snomed:'229065009',
+    section:'Activity',
+    type:'multi',
+    headline:'What activities do you currently participate in?',
+    options:['Walking','Running','Gym','Golf','Football','Tennis','Hiking','Other'],
+    snomedOptions:{
+      'Walking':'88383001','Running':'22723002','Gym':'229065009','Golf':'229065009',
+      'Football':'229065009','Tennis':'229065009','Hiking':'88383001','Other':'74964007'
+    }
+  },
+  {
+    id:'footwear_contrib',
+    snomed:'229845001',
+    section:'Footwear',
+    type:'single',
+    headline:'Do you think footwear contributes to your symptoms?',
+    options:['Yes','No','Unsure'],
+    snomedOptions:{ 'Yes':'10828004', 'No':'260385009', 'Unsure':'82334004' }
+  },
+  {
+    id:'footwear_type',
+    snomed:'229845001',
+    section:'Footwear',
+    type:'multi',
+    headline:'What footwear do you spend most of your day in?',
+    options:['Safety boots','Formal shoes','Trainers','Walking shoes','Sandals'],
+    snomedOptions:{
+      'Safety boots':'229845001','Formal shoes':'229845001','Trainers':'229845001',
+      'Walking shoes':'229845001','Sandals':'229845001'
+    }
+  },
+  {id:'photo',snomed:'708301004',section:'Photo',type:'photo',headline:'Attach a photo of your foot or ankle (optional)',sub:'A clear photo can help your clinician prepare for your appointment. This is optional — tap "Skip" to continue without one.'}
+];
+
+const SECTION_COLORS={
+  'EFAS Score':{fg:'#C8F000',bg:'rgba(200,240,0,0.08)',border:'rgba(200,240,0,0.25)'},
+  'Red flags':{fg:'#f09595',bg:'rgba(226,75,74,0.1)',border:'rgba(226,75,74,0.25)'},
+  'Location':{fg:'#C8F000',bg:'rgba(200,240,0,0.08)',border:'rgba(200,240,0,0.25)'},
+  'History':{fg:'#b097ff',bg:'rgba(160,120,255,0.1)',border:'rgba(160,120,255,0.25)'},
+  'Your goals':{fg:'#C8F000',bg:'rgba(200,240,0,0.08)',border:'rgba(200,240,0,0.25)'},
+  'Your beliefs':{fg:'#ffb060',bg:'rgba(255,165,60,0.1)',border:'rgba(255,165,60,0.25)'},
+  'Impact':{fg:'#ff8080',bg:'rgba(255,100,100,0.1)',border:'rgba(255,100,100,0.25)'},
+  'Mindset':{fg:'#5be8ff',bg:'rgba(91,232,255,0.08)',border:'rgba(91,232,255,0.2)'},
+  'Expectations':{fg:'#c097ff',bg:'rgba(192,151,255,0.1)',border:'rgba(192,151,255,0.25)'},
+  'Preferences':{fg:'#C8F000',bg:'rgba(200,240,0,0.08)',border:'rgba(200,240,0,0.25)'},
+  'Barriers':{fg:'#ffc050',bg:'rgba(255,192,80,0.1)',border:'rgba(255,192,80,0.25)'},
+  'Motivation':{fg:'#C8F000',bg:'rgba(200,240,0,0.08)',border:'rgba(200,240,0,0.25)'},
+  'Activity':{fg:'#70ffb0',bg:'rgba(112,255,176,0.08)',border:'rgba(112,255,176,0.2)'},
+  'Footwear':{fg:'#ffb07b',bg:'rgba(255,176,120,0.1)',border:'rgba(255,176,120,0.25)'},
+  'Photo':{fg:'#5be8ff',bg:'rgba(91,232,255,0.08)',border:'rgba(91,232,255,0.2)'}
+};
+
+let current=0, answers={}, scaleVals={}, efasVals={};
+QUESTIONS.forEach(q=>{if(q.type==='scale')scaleVals[q.id]=5;if(q.type==='efas')efasVals[q.id]=2;});
+
+// ── HELPERS ────────────────────────────────────────────────────────
+function hideAll() {
+  ['postcode-gate-view','red-flag-screening-view','registration-view','registration-view2','registration-view3','rf-gate-view','questionnaire-view','summary-view']
+    .forEach(id=>{ const el=document.getElementById(id); if(el){ el.classList.add('hidden'); el.style.display=''; } });
+}
+
+// ── REGISTRATION ───────────────────────────────────────────────────
+function setRegSomeoneElse(val, container) {
+  answers['reg_someone_else'] = val;
+  container.querySelectorAll('.opt').forEach(el=>{
+    el.classList.toggle('selected', el.querySelector('.opt-label').textContent === val);
+  });
+  const errEl = document.getElementById('err_someone_else');
+  if(errEl) errEl.classList.remove('show');
+
+  const relContainer = document.getElementById('relationship_container');
+  if(val === 'Yes') {
+    relContainer.classList.remove('hidden');
+  } else {
+    relContainer.classList.add('hidden');
+    answers['reg_relationship'] = undefined;
+    document.getElementById('relationship_opts').querySelectorAll('.opt').forEach(o => o.classList.remove('selected'));
+  }
+}
+
+function setRegInterpreter(val, container) {
+  setReg('reg_interpreter', val, container);
+  const langContainer = document.getElementById('language_container');
+  if (val === 'Yes') {
+    langContainer.classList.remove('hidden');
+  } else {
+    langContainer.classList.add('hidden');
+    answers['reg_language'] = undefined;
+    const langSelect = document.getElementById('reg_language');
+    if (langSelect) langSelect.value = '';
+    const errLang = document.getElementById('err_language');
+    if (errLang) errLang.classList.remove('show');
+  }
+}
+
+function setReg(key,val,container){
+  answers[key]=val;
+  container.querySelectorAll('.opt').forEach(el=>{
+    el.classList.toggle('selected',el.querySelector('.opt-label').textContent===val);
+  });
+  const errId='err_'+key.replace('reg_','');
+  const errEl=document.getElementById(errId);
+  if(errEl){errEl.classList.remove('show');}
+}
+
+function validateReg1(){
+  const fields=[
+    {id:'reg_name',   err:'err_name'},
+    {id:'reg_dob',    err:'err_dob'},
+    {id:'reg_address',err:'err_address'},
+    {id:'reg_postcode',err:'err_postcode'},
+    {id:'reg_tel',    err:'err_tel'},
+    {id:'reg_gp',     err:'err_gp'}
+  ];
+  let ok=true;
+  fields.forEach(f=>{
+    const el=document.getElementById(f.id);
+    const errEl=document.getElementById(f.err);
+    const empty=!el||!el.value.trim();
+    if(errEl) errEl.classList.toggle('show',empty);
+    if(el) el.classList.toggle('err',empty);
+    if(empty) ok=false;
+  });
+
+  const someoneElse = answers['reg_someone_else'];
+  const seErr = document.getElementById('err_someone_else');
+  if(!someoneElse) {
+    if(seErr) seErr.classList.add('show');
+    ok = false;
+  } else {
+    if(seErr) seErr.classList.remove('show');
+  }
+
+  if(someoneElse === 'Yes') {
+    const rel = answers['reg_relationship'];
+    const relErr = document.getElementById('err_relationship');
+    if(!rel) {
+      if(relErr) relErr.classList.add('show');
+      ok = false;
+    } else {
+      if(relErr) relErr.classList.remove('show');
+    }
+  }
+
+  return ok;
+}
+
+function validateReg2(){
+  const checks=[
+    {key:'reg_voicemail',err:'err_voicemail'},
+    {key:'reg_consent',err:'err_consent'},
+    {key:'reg_interpreter',err:'err_interpreter'},
+    {key:'reg_travel',err:'err_travel'},
+    {key:'reg_video',err:'err_video'}
+  ];
+  let ok=true;
+  checks.forEach(c=>{
+    const errEl=document.getElementById(c.err);
+    const empty=!answers[c.key];
+    if(errEl) errEl.classList.toggle('show',empty);
+    if(empty) ok=false;
+  });
+
+  if (answers['reg_interpreter'] === 'Yes') {
+    const langSelect = document.getElementById('reg_language');
+    const errLang = document.getElementById('err_language');
+    const val = langSelect ? langSelect.value : '';
+    if (!val) {
+      if (errLang) errLang.classList.add('show');
+      if (langSelect) langSelect.classList.add('err');
+      ok = false;
+    } else {
+      if (errLang) errLang.classList.remove('show');
+      if (langSelect) langSelect.classList.remove('err');
+    }
+  }
+
+  return ok;
+}
+
+function goToReg2(){
+  if(!validateReg1()) return;
+  answers.reg_name=document.getElementById('reg_name').value.trim();
+  answers.reg_dob=document.getElementById('reg_dob').value;
+  answers.reg_address=document.getElementById('reg_address').value.trim();
+  answers.reg_postcode=document.getElementById('reg_postcode').value.trim().toUpperCase();
+  answers.reg_tel=document.getElementById('reg_tel').value.trim();
+  answers.reg_email=document.getElementById('reg_email').value.trim();
+  answers.reg_gp=document.getElementById('reg_gp').value.trim();
+  hideAll();
+  const el=document.getElementById('registration-view2');
+  el.classList.remove('hidden'); el.style.display='flex';
+}
+function showReg1(){
+  hideAll();
+  const el=document.getElementById('registration-view');
+  el.classList.remove('hidden'); el.style.display='flex';
+}
+function goToReg3(){
+  if(!validateReg2()) return;
+  if (answers['reg_interpreter'] === 'Yes') {
+    answers.reg_language = document.getElementById('reg_language').value;
+  } else {
+    answers.reg_language = null;
+  }
+  answers.reg_unavailable=document.getElementById('reg_unavailable').value.trim();
+  hideAll();
+  const el=document.getElementById('registration-view3');
+  el.classList.remove('hidden'); el.style.display='flex';
+}
+function showReg2(){
+  hideAll();
+  const el=document.getElementById('registration-view2');
+  el.classList.remove('hidden'); el.style.display='flex';
+}
+function startQuestionnaire(){
+  answers.reg_medications=document.getElementById('reg_medications').value.trim();
+  hideAll();
+  const qv=document.getElementById('questionnaire-view');
+  qv.classList.remove('hidden'); qv.style.display='flex';
+  current=0; renderQ();
+}
+
+// ── RENDER QUESTIONNAIRE ─────────────────────────────────────────────
+function renderQ(){
+  const q=QUESTIONS[current];
+  const fill=((current+1)/QUESTIONS.length*100).toFixed(1);
+  document.getElementById('prog-fill').style.width=fill+'%';
+  document.getElementById('prog-count').textContent=(current+1)+' / '+QUESTIONS.length;
+  document.getElementById('prog-section').textContent=q.section;
+  document.getElementById('btn-back').classList.toggle('hidden',current===0);
+
+  const col=SECTION_COLORS[q.section]||SECTION_COLORS['Location'];
+  let html='';
+  html+=`<div class="section-tag" style="color:${col.fg};background:${col.bg};border:1px solid ${col.border}">${q.section}</div>`;
+  html+=`<div class="q-headline">${q.headline}</div>`;
+  if(q.sub) html+=`<div class="q-sub">${q.sub}</div>`;
+
+  if(q.warn){
+    html+=`<div class="warn-banner"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><div>If any of these are present, selecting them may indicate your symptoms are better managed by a different service. Please be as accurate as possible.</div></div>`;
+  }
+
+  if(q.type==='efas'){
+    const v=efasVals[q.id];
+    const lbl=efasLabel(q,v);
+    const c=efasColor(v);
+    html+=`<div class="efas-card" data-snomed="${q.snomed}">
+      <div class="efas-num-big" id="ev_${q.id}" style="color:${c}">${v}</div>
+      <div class="efas-label-display" id="el_${q.id}" style="color:${c}">${lbl}</div>
+      <div class="efas-ends"><span>${q.minLabel}</span><span>${q.maxLabel}</span></div>
+      <input type="range" min="0" max="4" step="1" value="${v}" id="er_${q.id}" oninput="updateEfas('${q.id}',+this.value)" aria-label="${q.headline}">
+      <div class="efas-ticks">${[0,1,2,3,4].map(i=>`<span class="efas-tick">${i}</span>`).join('')}</div>
+    </div>`;
+  }
+
+  if(q.type==='single'||q.type==='multi'){
+    const multi=q.type==='multi';
+    const useGrid = q.options.length > 3 ? ' grid-opt' : '';
+    html+=`<div class="options-list${useGrid}" id="opts_${q.id}" data-snomed="${q.snomed}">`;
+    q.options.forEach((opt,idx)=>{
+      const sel=(answers[q.id]||[]).includes(opt)?'selected':'';
+      const safeOpt=opt.replace(/&/g,'&amp;').replace(/"/g,'&quot;');
+      const snomedCode = q.snomedOptions ? (q.snomedOptions[opt] || '') : '';
+      html+=`<div class="opt${multi?' sq':''} ${sel}" data-qid="${q.id}" data-val="${safeOpt}" data-snomed="${snomedCode}" data-multi="${multi}" role="${multi?'checkbox':'radio'}" aria-checked="${sel?'true':'false'}" tabindex="0">
+        <div class="opt-marker"><svg viewBox="0 0 12 12" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round"><polyline points="2,6 5,9 10,3"/></svg></div>
+        <span class="opt-label">${opt}</span>
+      </div>`;
+    });
+    if(q.none){
+      const nsel=(answers[q.id]||[]).includes('__none__')?'selected':'';
+      html+=`<div class="opt sq none-opt ${nsel}" data-qid="${q.id}" data-val="__none__" data-snomed="260413007" data-multi="${multi}" role="checkbox" aria-checked="${nsel?'true':'false'}" tabindex="0">
+        <div class="opt-marker"><svg viewBox="0 0 12 12" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round"><polyline points="2,6 5,9 10,3"/></svg></div>
+        <span class="opt-label">${q.none}</span>
+      </div>`;
+    }
+    html+=`</div>`;
+    if(q.followups) q.followups.forEach(fu=>{html+=`<div class="followup-block"><div class="followup-label">${fu.label}</div><textarea rows="2" placeholder="Your answer…" id="fu_${fu.key}" oninput="answers['${fu.key}']=this.value">${answers[fu.key]||''}</textarea></div>`;});
+    if(q.freetext) html+=`<div class="followup-block"><div class="followup-label">${q.freetext.label}</div><textarea rows="2" placeholder="${q.freetext.placeholder}" id="ft_${q.freetext.key}" oninput="answers['${q.freetext.key}']=this.value">${answers[q.freetext.key]||''}</textarea></div>`;
+  }
+
+  if(q.type==='scale'){
+    const v=scaleVals[q.id];
+    const c=v>=7?'#6dc87e':v>=4?'#f5a623':'#E24B4A';
+    html+=`<div class="scale-card" data-snomed="${q.snomed}">
+      <div class="scale-num-big" id="sv_${q.id}" style="color:${c}">${v}</div>
+      <div class="scale-ends"><span>0</span><span>10</span></div>
+      <input type="range" min="${q.min}" max="${q.max}" step="1" value="${v}" id="range_${q.id}" oninput="updateScale('${q.id}',+this.value)" aria-label="${q.headline}">
+      <div class="scale-ticks">${Array.from({length:11},(_,i)=>`<span class="scale-tick">${i}</span>`).join('')}</div>
+    </div>`;
+    if(q.followups) q.followups.forEach(fu=>{html+=`<div class="followup-block"><div class="followup-label">${fu.label}</div><textarea rows="2" placeholder="Your answer…" id="fu_${fu.key}" oninput="answers['${fu.key}']=this.value">${answers[fu.key]||''}</textarea></div>`;});
+  }
+
+  if(q.type==='freetext'){
+    html+=`<div class="freetext-main" data-snomed="${q.snomed}"><textarea rows="4" placeholder="${q.placeholder}" id="ft_main_${q.id}" oninput="answers['${q.key}']=this.value" aria-label="${q.headline}">${answers[q.key]||''}</textarea></div>`;
+  }
+
+  if(q.type==='photo'){
+    const hasImg=!!attachedImageDataURL;
+    html+=`<div id="img-upload-area" class="img-upload-area" onclick="document.getElementById('img-file-input').click()" ${hasImg?'style="display:none"':''}>
+      <input type="file" id="img-file-input" accept="image/*" onchange="handleImageUpload(this)">
+      <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" style="color:var(--text-muted);margin-bottom:12px"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21,15 16,10 5,21"/></svg>
+      <div style="font-size:15px;font-weight:600;color:var(--text-muted);margin-bottom:4px">Tap to attach a photo</div>
+      <div style="font-size:13px;color:var(--text-hint)">JPG, PNG or HEIC · Max 10MB</div>
+    </div>
+    <div id="img-preview-wrap" class="${hasImg?'':'hidden'} img-preview-wrap">
+      <img id="img-preview" class="img-preview" src="${attachedImageDataURL||''}" alt="Attached foot/ankle photo">
+      <button class="img-remove-btn" onclick="removeImage()">Remove photo</button>
+    </div>`;
+  }
+
+  document.getElementById('question-area').innerHTML=html;
+
+  document.getElementById('question-area').addEventListener('click', qaClickHandler, {once:true, capture:false});
+  document.getElementById('question-area').addEventListener('keydown', qaKeyHandler, {once:true, capture:false});
+
+  document.getElementById('question-area').scrollTop=0;
+
+  const btn=document.getElementById('btn-next');
+  const isPhoto=q.type==='photo';
+  const isLast=current===QUESTIONS.length-1;
+  btn.innerHTML = isLast
+    ? (isPhoto
+        ? 'Submit <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20,6 9,12 4,9"/><line x1="4" y1="18" x2="20" y2="18"/></svg>'
+        : 'Submit <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20,6 9,12 4,9"/><line x1="4" y1="18" x2="20" y2="18"/></svg>')
+    : (isPhoto
+        ? 'Skip <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9,18 15,12 9,6"/></svg>'
+        : 'Continue <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9,18 15,12 9,6"/></svg>');
+  if(isPhoto && attachedImageDataURL) btn.innerHTML='Submit photo &amp; continue <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9,18 15,12 9,6"/></svg>';
+}
+
+function qaClickHandler(e){
+  const opt=e.target.closest('.opt');
+  if(!opt) return;
+  const qid=opt.dataset.qid;
+  const val=opt.dataset.val;
+  const multi=opt.dataset.multi==='true';
+  if(!qid||val===undefined) return;
+  handleOptSelect(qid,val,multi);
+  document.getElementById('question-area').addEventListener('click',qaClickHandler,{once:true});
+}
+function qaKeyHandler(e){
+  if(e.key==='Enter'||e.key===' '){
+    const opt=e.target.closest('.opt');
+    if(!opt) return;
+    e.preventDefault();
+    const qid=opt.dataset.qid; const val=opt.dataset.val; const multi=opt.dataset.multi==='true';
+    if(qid&&val!==undefined) handleOptSelect(qid,val,multi);
+    document.getElementById('question-area').addEventListener('keydown',qaKeyHandler,{once:true});
+  }
+}
+
+function handleOptSelect(qid,val,multi){
+  if(!answers[qid]) answers[qid]=[];
+  if(val==='__none__'){
+    answers[qid]=['__none__'];
+  } else if(!multi){
+    answers[qid]=[val];
+  } else {
+    const ni=answers[qid].indexOf('__none__');
+    if(ni>-1) answers[qid].splice(ni,1);
+    const i=answers[qid].indexOf(val);
+    if(i>-1) answers[qid].splice(i,1); else answers[qid].push(val);
+  }
+  const container=document.getElementById('opts_'+qid);
+  if(!container) return;
+  container.querySelectorAll('.opt').forEach(el=>{
+    const elVal=el.dataset.val;
+    let sel;
+    if(elVal==='__none__') sel=answers[qid].includes('__none__');
+    else sel=answers[qid].includes(elVal);
+    el.classList.toggle('selected',sel);
+    el.setAttribute('aria-checked',sel.toString());
+  });
+}
+
+function updateEfas(qid,v){
+  efasVals[qid]=v; answers[qid]=v;
+  const q=QUESTIONS.find(x=>x.id===qid);
+  const c=efasColor(v);
+  const nd=document.getElementById('ev_'+qid);
+  const ld=document.getElementById('el_'+qid);
+  if(nd){nd.textContent=v;nd.style.color=c;}
+  if(ld){ld.textContent=efasLabel(q,v);ld.style.color=c;}
+}
+function updateScale(qid,v){
+  scaleVals[qid]=v; answers[qid]=v;
+  const el=document.getElementById('sv_'+qid);
+  if(el){el.textContent=v;el.style.color=v>=7?'#6dc87e':v>=4?'#f5a623':'#E24B4A';}
+}
+
+function nextQ(){
+  const q=QUESTIONS[current];
+  if(q.type==='scale') answers[q.id]=scaleVals[q.id];
+  if(q.type==='efas') answers[q.id]=efasVals[q.id];
+
+  if(current<QUESTIONS.length-1){current++;renderQ();}
+  else{showSummary();}
+}
+function prevQ(){if(current>0){current--;renderQ();}}
+
+/* ── BACKEND TRAKCARE & SNOMED CT PAYLOAD BUILDER ──────────────────── */
+window.generateTrakCareSNOMEDPayload = function() {
+  const payload = {
+    resourceType: "Bundle",
+    type: "transaction",
+    meta: {
+      system: "http://snomed.info/sct",
+      profile: "https://fhir.hl7.org.uk/StructureDefinition/UKCore-ServiceRequest",
+      exportedAt: new Date().toISOString()
+    },
+    patientDemographics: {
+      name: answers.reg_name || null,
+      dob: answers.reg_dob || null,
+      address: answers.reg_address || null,
+      postcode: answers.reg_postcode || null,
+      telephone: answers.reg_tel || null,
+      email: answers.reg_email || null,
+      gpPractice: answers.reg_gp || null,
+      interpreterRequired: answers.reg_interpreter || null,
+      language: answers.reg_language || null
+    },
+    medicalHistory: (answers.reg_conditions_list || []).map(condName => {
+      const match = HEALTH_CONDITIONS.find(c => c.name === condName);
+      return {
+        display: condName,
+        snomedCode: match ? match.snomed : "74964007",
+        system: "http://snomed.info/sct"
+      };
+    }),
+    clinicalObservations: []
+  };
+
+  // Include Red Flags in payload
+  if (answers.red_flags) {
+    answers.red_flags.forEach(rf => {
+      if (rf !== '__none__') {
+        const item = RED_FLAG_ITEMS.find(i => i.name === rf);
+        payload.clinicalObservations.push({
+          questionId: 'red_flags',
+          questionText: 'Are any of the following present?',
+          questionSnomed: '103390000',
+          answerText: rf,
+          answerSnomed: item ? item.code : '74964007',
+          system: "http://snomed.info/sct"
+        });
+      }
+    });
+  }
+
+  QUESTIONS.forEach(q => {
+    const userVal = answers[q.id];
+    if (userVal !== undefined && userVal !== null) {
+      if (Array.isArray(userVal)) {
+        userVal.forEach(v => {
+          if (v !== '__none__') {
+            const snomedCode = q.snomedOptions ? (q.snomedOptions[v] || '74964007') : q.snomed;
+            payload.clinicalObservations.push({
+              questionId: q.id,
+              questionText: q.headline,
+              questionSnomed: q.snomed || '74964007',
+              answerText: v,
+              answerSnomed: snomedCode,
+              system: "http://snomed.info/sct"
+            });
+          }
+        });
+      } else {
+        payload.clinicalObservations.push({
+          questionId: q.id,
+          questionText: q.headline,
+          questionSnomed: q.snomed || '74964007',
+          answerValue: userVal,
+          system: "http://snomed.info/sct"
+        });
+      }
+    }
+  });
+
+  return payload;
+};
+
+// ── SUMMARY ────────────────────────────────────────────────────────
+function av(k){return answers[k];}
+function arrVal(k){const a=answers[k];if(!a||a.length===0)return null;if(a[0]==='__none__')return null;return a;}
+function singleVal(k){const a=arrVal(k);return a?a[0]:null;}
+function textVal(k){const t=answers[k];return(t&&String(t).trim())?String(t).trim():null;}
+function chips(arr,cls=''){if(!arr||arr.length===0)return '<span style="color:var(--text-hint);font-size:12px">—</span>';return '<div class="chips-wrap">'+arr.map(a=>`<span class="chip ${cls}">${a}</span>`).join('')+'</div>';}
+function scoreBar(sv,color){return `<div class="scale-summary"><span class="ss-num" style="color:${color}">${sv}</span><div class="ss-track"><div class="ss-fill" style="width:${sv*10}%;background:${color}"></div></div><span style="font-size:12px;color:var(--text-hint)">/10</span></div>`;}
+function scoreColor(sv){return sv>=7?'#6dc87e':sv>=4?'#f5a623':'#E24B4A';}
+
+function copyTrakCarePayload() {
+  const data = window.generateTrakCareSNOMEDPayload();
+  const jsonStr = JSON.stringify(data, null, 2);
+  navigator.clipboard.writeText(jsonStr).then(() => {
+    alert("TrakCare SNOMED CT JSON payload copied to clipboard!");
+  }).catch(err => {
+    console.log("JSON Payload Output:", data);
+    alert("Payload generated in console (F12)!");
+  });
+}
+
+function showSummary(){
+  hideAll();
+  document.getElementById('mode-badge').textContent='Clinician';
+  document.getElementById('mode-badge').className='header-mode-badge badge-clinician';
+  document.getElementById('header-sub').textContent='Triage Summary Report';
+
+  const flags=arrVal('red_flags'); const hasFlags=flags&&flags.length>0;
+  const dateStr=new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
+  const patName=answers.reg_name||'Patient';
+  const initials=patName.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2)||'PT';
+
+  const ci=answers.confidence_improve!==undefined?answers.confidence_improve:5;
+  const imp=answers.importance!==undefined?answers.importance:5;
+  const se=answers.self_efficacy!==undefined?answers.self_efficacy:5;
+  const efasTotal=[1,2,3,4,5,6].reduce((s,n)=>{const val=answers['efas'+n];return s+(val!==undefined?Number(val):2);},0);
+  const efasMax=24;
+
+  const side=singleVal('side'),dur=singleVal('duration'),locs=arrVal('location');
+  const refReason=arrVal('referral_reason'),cause=arrVal('cause_belief');
+  const avoided=arrVal('avoided'),movBelief=singleVal('movement_belief');
+  const txTried=arrVal('treatments'),txHelped=textVal('tx_helped'),txLeast=textVal('tx_least');
+  const limited=arrVal('limited'),priority=textVal('priority_activity');
+  const recTime=singleVal('recovery_time'),txPref=arrVal('treatment_pref');
+  const barriers=arrVal('barriers'),barriersOther=textVal('barriers_other');
+  const importanceWhy=textVal('importance_why'),selfEffBoost=textVal('self_eff_boost');
+  const oneGoal=textVal('one_goal_text');
+  const actLevel=singleVal('activity_level'),steps=singleVal('steps'),activities=arrVal('activities');
+  const fwContrib=singleVal('footwear_contrib'),fwType=arrVal('footwear_type');
+  const conditionsList = arrVal('reg_conditions_list');
+
+  let html=`
+  <div class="sum-header">
+    <div class="sum-patient-row">
+      <div class="sum-avatar">${initials}</div>
+      <div><div class="sum-name">${patName}</div><div class="sum-meta">Submitted ${dateStr} · MSK Podiatry Triage</div></div>
+    </div>
+    <div class="sum-flag-badge ${hasFlags?'flag-red':'flag-clear'}">
+      ${hasFlags
+        ?'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/></svg> Red flags present — review urgently'
+        :'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22,4 12,14.01 9,11.01"/></svg> No red flags identified'}
+    </div>
+  </div>
+  <div class="sum-body">
+  <div class="kpi-grid">
+    <div class="kpi-card"><div class="kpi-label">Duration</div><div class="kpi-val" style="font-size:${dur&&dur.length>10?'14px':'24px'}">${dur||'—'}</div></div>
+    <div class="kpi-card"><div class="kpi-label">Side</div><div class="kpi-val">${side||'—'}</div></div>
+    <div class="kpi-card"><div class="kpi-label">EFAS Total</div><div class="kpi-val" style="color:${efasTotal>=16?'#6dc87e':efasTotal>=8?'#f5a623':'#E24B4A'}">${efasTotal}<span class="kpi-unit">/${efasMax}</span></div><div class="kpi-bar"><div class="kpi-fill" style="width:${(efasTotal/efasMax*100).toFixed(1)}%;background:${efasTotal>=16?'#6dc87e':efasTotal>=8?'#f5a623':'#E24B4A'}"></div></div></div>
+    <div class="kpi-card"><div class="kpi-label">Confidence</div><div class="kpi-val" style="color:${scoreColor(ci)}">${ci}<span class="kpi-unit">/10</span></div><div class="kpi-bar"><div class="kpi-fill" style="width:${ci*10}%;background:${scoreColor(ci)}"></div></div></div>
+    <div class="kpi-card"><div class="kpi-label">Importance</div><div class="kpi-val" style="color:${scoreColor(imp)}">${imp}<span class="kpi-unit">/10</span></div><div class="kpi-bar"><div class="kpi-fill" style="width:${imp*10}%;background:${scoreColor(imp)}"></div></div></div>
+    <div class="kpi-card"><div class="kpi-label">Self-efficacy</div><div class="kpi-val" style="color:${scoreColor(se)}">${se}<span class="kpi-unit">/10</span></div><div class="kpi-bar"><div class="kpi-fill" style="width:${se*10}%;background:${scoreColor(se)}"></div></div></div>
+  </div>`;
+
+  html+=`<div class="sum-section"><div class="sum-section-title">Patient details</div><div class="sum-card">
+    <div class="sum-row"><span class="sr-label">Name</span><span class="sr-val">${answers.reg_name||'—'}</span></div>
+    <div class="sum-row"><span class="sr-label">Date of birth</span><span class="sr-val">${answers.reg_dob?new Date(answers.reg_dob+'T00:00:00').toLocaleDateString('en-GB'):'—'}</span></div>
+    <div class="sum-row"><span class="sr-label">Filling for someone else</span><span class="sr-val">${answers.reg_someone_else||'No'}</span></div>
+    ${answers.reg_someone_else==='Yes'?`<div class="sum-row"><span class="sr-label">Relationship</span><span class="sr-val">${answers.reg_relationship||'—'}</span></div>`:''}
+    <div class="sum-row"><span class="sr-label">Address</span><span class="sr-val" style="text-align:right">${[answers.reg_address,answers.reg_postcode].filter(Boolean).join(', ')||'—'}</span></div>
+    <div class="sum-row"><span class="sr-label">Telephone</span><span class="sr-val">${answers.reg_tel||'—'}</span></div>
+    <div class="sum-row"><span class="sr-label">Email</span><span class="sr-val">${answers.reg_email||'—'}</span></div>
+    <div class="sum-row"><span class="sr-label">GP practice</span><span class="sr-val">${answers.reg_gp||'—'}</span></div>
+    <div class="sum-row"><span class="sr-label">Voicemail OK</span><span class="sr-val">${answers.reg_voicemail||'—'}</span></div>
+  </div></div>`;
+
+  html+=`<div class="sum-section"><div class="sum-section-title">Admin &amp; access</div><div class="sum-card">
+    <div class="sum-row"><span class="sr-label">Medical records consent</span><span class="sr-val">${answers.reg_consent||'—'}</span></div>
+    <div class="sum-row"><span class="sr-label">Interpreter required</span><span class="sr-val">${answers.reg_interpreter||'—'}${answers.reg_interpreter==='Yes' && answers.reg_language ? ' ('+answers.reg_language+')' : ''}</span></div>
+    <div class="sum-row"><span class="sr-label">Travel outwith local area</span><span class="sr-val">${answers.reg_travel||'—'}</span></div>
+    <div class="sum-row"><span class="sr-label">Video appointment</span><span class="sr-val">${answers.reg_video||'—'}</span></div>
+    ${answers.reg_unavailable?`<div class="sum-row"><span class="sr-label">Unavailable dates</span><span class="sr-val">${answers.reg_unavailable}</span></div>`:''}
+  </div></div>`;
+
+  html+=`<div class="sum-section"><div class="sum-section-title">Medical history</div><div class="sum-card">
+    <div class="sum-row"><span class="sr-label">Diagnosed conditions</span>${chips(conditionsList,'chip-b')}</div>
+    <div class="sum-row" style="flex-direction:column;align-items:flex-start;gap:6px"><span class="sr-label">Current medications</span><span class="sr-val" style="text-align:left;width:100%">${answers.reg_medications||'None stated'}</span></div>
+  </div></div>`;
+
+  html+=`<div class="sum-section"><div class="sum-section-title">Red flag screening</div>`;
+  if(hasFlags){flags.forEach(f=>{html+=`<div class="red-flag-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="flex-shrink:0;margin-top:1px"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/></svg>${f}</div>`;});}
+  else{html+=`<div class="red-flag-clear"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22,4 12,14.01 9,11.01"/></svg>All red flag items negative — no urgent escalation indicated</div>`;}
+  html+=`</div>`;
+
+  const efasLabels=['Pain at rest','Walking distance','Gait change','Uneven surfaces','Pain walking','Pain in activity'];
+  html+=`<div class="sum-section"><div class="sum-section-title">EFAS Score — European Foot &amp; Ankle Society</div><div class="sum-card">`;
+  [1,2,3,4,5,6].forEach((n,i)=>{
+    const val=answers['efas'+n]!==undefined?answers['efas'+n]:2;
+    const c=efasColor(val);
+    html+=`<div class="sum-row"><span class="sr-label">${efasLabels[i]}</span>
+      <div style="display:flex;align-items:center;gap:10px;justify-content:flex-end">
+        <span style="font-size:18px;font-weight:800;color:${c}">${val}</span>
+        <div style="width:70px;height:6px;background:var(--surface3);border-radius:3px;overflow:hidden"><div style="width:${val/4*100}%;height:100%;background:${c};border-radius:3px"></div></div>
+        <span style="font-size:11px;color:var(--text-hint)">/4</span>
+      </div></div>`;
+  });
+  html+=`</div>
+  <div style="margin-top:12px;padding:14px 18px;background:var(--surface);border:1px solid var(--border);border-radius:14px;display:flex;align-items:center;gap:16px;">
+    <div><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-hint);margin-bottom:4px">Total EFAS Score</div>
+      <div style="font-size:32px;font-weight:800;color:${efasTotal>=16?'#6dc87e':efasTotal>=8?'#f5a623':'#E24B4A'};line-height:1">${efasTotal}<span style="font-size:14px;font-weight:400;color:var(--text-hint)"> / ${efasMax}</span></div>
+    </div>
+    <div style="flex:1;height:6px;background:var(--surface3);border-radius:3px;overflow:hidden"><div style="width:${(efasTotal/efasMax*100).toFixed(1)}%;height:100%;background:${efasTotal>=16?'#6dc87e':efasTotal>=8?'#f5a623':'#E24B4A'};border-radius:3px"></div></div>
+  </div></div>`;
+
+  html+=`<div class="sum-section"><div class="sum-section-title">Symptom location &amp; history</div><div class="sum-card">
+    <div class="sum-row"><span class="sr-label">Location</span>${chips(locs,'chip-g')}</div>
+    <div class="sum-row"><span class="sr-label">Side</span><span class="sr-val">${side||'—'}</span></div>
+    <div class="sum-row"><span class="sr-label">Duration</span><span class="sr-val">${dur||'—'}</span></div>
+  </div></div>`;
+
+  html+=`<div class="sum-section"><div class="sum-section-title">Referral goals &amp; beliefs</div><div class="sum-card">
+    <div class="sum-row"><span class="sr-label">Reason for referral</span>${chips(refReason,'chip-g')}</div>
+    <div class="sum-row"><span class="sr-label">Perceived cause</span>${chips(cause)}</div>
+    <div class="sum-row"><span class="sr-label">Movement belief</span><span class="sr-val" style="color:${movBelief==='Mostly harming'?'#f09595':movBelief==='Mostly helping'?'#6dc87e':'var(--text-muted)'}">${movBelief||'—'}</span></div>
+  </div></div>`;
+
+  html+=`<div class="sum-section"><div class="sum-section-title">Impact &amp; avoided activities</div><div class="sum-card">
+    <div class="sum-row"><span class="sr-label">Stopped due to worry</span>${chips(avoided)}</div>
+    <div class="sum-row"><span class="sr-label">Most limited activities</span>${chips(limited,'chip-g')}</div>
+    <div class="sum-row"><span class="sr-label">Priority to improve first</span><span class="sr-val">${priority||'—'}</span></div>
+  </div></div>`;
+
+  html+=`<div class="sum-section"><div class="sum-section-title">Treatment history</div><div class="sum-card">
+    <div class="sum-row"><span class="sr-label">Treatments tried</span>${chips(txTried)}</div>
+    <div class="sum-row"><span class="sr-label">Most helpful</span><span class="sr-val">${txHelped||'—'}</span></div>
+    <div class="sum-row"><span class="sr-label">Least helpful</span><span class="sr-val">${txLeast||'—'}</span></div>
+  </div></div>`;
+
+  html+=`<div class="sum-section"><div class="sum-section-title">Patient expectations</div><div class="sum-card">
+    <div class="sum-row"><span class="sr-label">Expected recovery time</span><span class="sr-val">${recTime||'—'}</span></div>
+    <div class="sum-row"><span class="sr-label">Preferred treatment</span>${chips(txPref,'chip-b')}</div>
+  </div></div>`;
+
+  html+=`<div class="sum-section"><div class="sum-section-title">Motivation &amp; readiness scores</div><div class="sum-card">
+    <div class="sum-row" style="flex-direction:column;align-items:flex-start;gap:8px"><span class="sr-label">Confidence problem can improve</span>${scoreBar(ci,scoreColor(ci))}</div>
+    <div class="sum-row" style="flex-direction:column;align-items:flex-start;gap:8px"><span class="sr-label">Importance of recovery right now</span>${scoreBar(imp,scoreColor(imp))}</div>
+    <div class="sum-row" style="flex-direction:column;align-items:flex-start;gap:8px"><span class="sr-label">Self-efficacy (confidence to follow plan)</span>${scoreBar(se,scoreColor(se))}</div>
+  </div></div>`;
+
+  if(importanceWhy||selfEffBoost){
+    html+=`<div class="sum-section"><div class="sum-section-title">Patient in their own words</div>`;
+    if(importanceWhy) html+=`<div class="quote-box" style="margin-bottom:12px"><div class="quote-label">Why recovery matters</div>"${importanceWhy}"</div>`;
+    if(selfEffBoost) html+=`<div class="quote-box"><div class="quote-label">What would improve self-efficacy</div>"${selfEffBoost}"</div>`;
+    html+=`</div>`;
+  }
+
+  html+=`<div class="sum-section"><div class="sum-section-title">Rehabilitation barriers</div><div class="sum-card">
+    <div class="sum-row"><span class="sr-label">Potential barriers</span>${chips(barriers)}</div>
+    ${barriersOther?`<div class="sum-row"><span class="sr-label">Additional notes</span><span class="sr-val" style="font-style:italic;color:var(--text-muted)">"${barriersOther}"</span></div>`:''}
+  </div></div>`;
+
+  if(oneGoal){html+=`<div class="sum-section"><div class="sum-section-title">Three-month goal</div>
+    <div class="goal-card"><div class="goal-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div>
+    <div><div class="goal-text">${oneGoal}</div><div class="goal-sub">Patient-defined priority outcome</div></div>
+    </div></div>`;}
+
+  html+=`<div class="sum-section"><div class="sum-section-title">Activity &amp; footwear</div><div class="sum-card">
+    <div class="sum-row"><span class="sr-label">Typical week</span><span class="sr-val">${actLevel||'—'}</span></div>
+    <div class="sum-row"><span class="sr-label">Step count</span><span class="sr-val">${steps||'—'}</span></div>
+    <div class="sum-row"><span class="sr-label">Activities</span>${chips(activities)}</div>
+    <div class="sum-row"><span class="sr-label">Footwear contributes?</span><span class="sr-val">${fwContrib||'—'}</span></div>
+    <div class="sum-row"><span class="sr-label">Main footwear</span>${chips(fwType,'chip-b')}</div>
+  </div></div>`;
+
+  if(attachedImageDataURL){
+    html+=`<div class="sum-section"><div class="sum-section-title">Attached photo</div>
+      <img src="${attachedImageDataURL}" class="sum-photo" alt="Patient-attached foot/ankle photo">
+    </div>`;
+  }
+
+  html+=`<div class="sum-actions">
+    <button class="act-btn act-btn-primary" onclick="window.print()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6,9 6,2 18,2 18,9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+      Print / Save PDF
+    </button>
+    <button class="act-btn" onclick="copyTrakCarePayload()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+      Copy TrakCare JSON
+    </button>
+    <button class="act-btn" onclick="restartQ()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="1,4 1,10 7,10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>
+      New triage
+    </button>
+  </div></div>`;
+
+  const sv=document.getElementById('summary-view');
+  sv.innerHTML=html;
+  sv.classList.remove('hidden');
+  sv.scrollTop=0;
+}
+
+function restartQ(){
+  current=0; answers={}; scaleVals={}; efasVals={}; attachedImageDataURL=null;
+  QUESTIONS.forEach(q=>{if(q.type==='scale')scaleVals[q.id]=5;if(q.type==='efas')efasVals[q.id]=2;});
+  hideAll();
+  showPostcodeGate();
+  document.getElementById('mode-badge').textContent='Patient';
+  document.getElementById('mode-badge').className='header-mode-badge badge-patient';
+  document.getElementById('header-sub').textContent='Foot & Ankle Assessment';
+  
+  const initPc = document.getElementById('initial_postcode');
+  if (initPc) initPc.value = '';
+  const outOfAreaMsg = document.getElementById('postcode_out_of_area_msg');
+  if (outOfAreaMsg) outOfAreaMsg.classList.add('hidden');
+  const errInitPc = document.getElementById('err_initial_postcode');
+  if (errInitPc) errInitPc.classList.remove('show');
+
+  ['reg_name','reg_dob','reg_address','reg_postcode','reg_tel','reg_email','reg_gp','reg_medications','reg_unavailable'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  ['vm_opts','consent_opts','interp_opts','travel_opts','video_opts','someone_else_opts','relationship_opts','conditions_checklist'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.querySelectorAll('.opt').forEach(o=>o.classList.remove('selected'));
+  });
+  const relContainer = document.getElementById('relationship_container');
+  if(relContainer) relContainer.classList.add('hidden');
+  const langContainer = document.getElementById('language_container');
+  if (langContainer) langContainer.classList.add('hidden');
+  const langSelect = document.getElementById('reg_language');
+  if (langSelect) langSelect.value = '';
+}
+</script>
+</body>
+</html>
